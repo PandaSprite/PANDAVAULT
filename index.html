@@ -795,7 +795,10 @@
                 const desc = escapeHtml(m.description || '');
                 const cat = escapeHtml(m.category || 'Utility');
                 const image = m.image || '';
-                return `<article class="mod-card overflow-hidden rounded-2xl border border-m3-border bg-m3-surface" style="--pv-color:${color}"><div class="aspect-video bg-black overflow-hidden">${image ? `<img src="${escapeHtml(image)}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display='none'">` : ''}</div><div class="p-4"><div class="pv-category inline-flex px-2 py-1 rounded-lg border text-[10px] font-mono uppercase">${cat}</div><h3 class="pv-custom-title mt-3 text-lg font-bold">${title}</h3><p class="pv-custom-description mt-1 text-sm line-clamp-3">${desc}</p><div class="mt-4 flex gap-2">${m.download ? `<a class="pv-download inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold text-black" href="${escapeHtml(m.download)}" target="_blank" rel="noopener">Download</a>` : ''}${m.youtube ? `<a class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-medium bg-m3-container border border-m3-border" href="${escapeHtml(m.youtube)}" target="_blank" rel="noopener">Preview</a>` : ''}</div></div></article>`;
+                const download = m.downloadUrl || m.download || '';
+                const youtube = m.youtubeUrl || m.youtube || '';
+                const admin = isAdmin ? `<div class="flex items-center space-x-1 ml-auto"><button type="button" onclick="editMod('${escapeHtml(m.id)}')" class="p-2 text-gray-400 hover:text-white bg-m3-surface hover:bg-m3-container rounded-xl border border-m3-border transition" title="Edit Mod"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-.39-1.02 0-1.41l1.83 1.83-3.75 3.75-1.83-1.83z"/></svg></button><button type="button" onclick="deleteMod('${escapeHtml(m.id)}')" class="p-2 text-gray-400 hover:text-white bg-m3-surface hover:bg-m3-container rounded-xl border border-m3-border transition" title="Delete Mod"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div>` : '';
+                return `<article class="mod-card overflow-hidden rounded-2xl border border-m3-border bg-m3-surface" style="--pv-color:${color}"><div class="aspect-video bg-black overflow-hidden">${image ? `<img src="${escapeHtml(image)}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display='none'">` : ''}</div><div class="p-4"><div class="flex items-center"><div class="pv-category inline-flex px-2 py-1 rounded-lg border text-[10px] font-mono uppercase">${cat}</div>${admin}</div><h3 class="pv-custom-title mt-3 text-lg font-bold">${title}</h3><p class="pv-custom-description mt-1 text-sm line-clamp-3">${desc}</p><div class="mt-4 flex gap-2">${download ? `<a class="pv-download inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold text-black" href="${escapeHtml(download)}" target="_blank" rel="noopener">Download</a>` : ''}${youtube ? `<a class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-medium bg-m3-container border border-m3-border" href="${escapeHtml(youtube)}" target="_blank" rel="noopener">Preview</a>` : ''}</div></div></article>`;
             }).join('');
             empty?.classList.toggle('hidden', filtered.length !== 0);
             renderUtilityMods();
@@ -803,8 +806,71 @@
         function renderUtilityMods(){
             const grid=document.getElementById('utilityGrid'), empty=document.getElementById('utilityEmpty'); if(!grid) return;
             const q=searchQuery.trim().toLowerCase(); const list=modsData.filter(m=>(m.category||'').toLowerCase()==='utility' && (!q || JSON.stringify(m).toLowerCase().includes(q)));
-            grid.innerHTML=list.map(m=>{const color=m.color||'#fff';return `<article class="mod-card overflow-hidden rounded-2xl border border-m3-border bg-m3-surface" style="--pv-color:${color}"><div class="aspect-video bg-black overflow-hidden">${m.image?`<img src="${escapeHtml(m.image)}" alt="" class="w-full h-full object-cover" loading="lazy">`:''}</div><div class="p-4"><div class="pv-category inline-flex px-2 py-1 rounded-lg border text-[10px] font-mono uppercase">Utility</div><h3 class="pv-custom-title mt-3 text-lg font-bold">${escapeHtml(m.title||'Untitled Mod')}</h3><p class="pv-custom-description mt-1 text-sm">${escapeHtml(m.description||'')}</p></div></article>`}).join(''); empty?.classList.toggle('hidden', list.length!==0);
+            grid.innerHTML=list.map(m=>{const color=m.color||'#fff'; const admin=isAdmin?`<div class="flex items-center space-x-1 ml-auto"><button type="button" onclick="editMod('${escapeHtml(m.id)}')" class="p-2 text-gray-400 hover:text-white bg-m3-surface hover:bg-m3-container rounded-xl border border-m3-border transition" title="Edit Mod"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94 14.06 6.19 3 17.25z"/></svg></button><button type="button" onclick="deleteMod('${escapeHtml(m.id)}')" class="p-2 text-gray-400 hover:text-white bg-m3-surface hover:bg-m3-container rounded-xl border border-m3-border transition" title="Delete Mod"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div>`:''; return `<article class="mod-card overflow-hidden rounded-2xl border border-m3-border bg-m3-surface" style="--pv-color:${color}"><div class="aspect-video bg-black overflow-hidden">${m.image?`<img src="${escapeHtml(m.image)}" alt="" class="w-full h-full object-cover" loading="lazy">`:''}</div><div class="p-4"><div class="flex items-center"><div class="pv-category inline-flex px-2 py-1 rounded-lg border text-[10px] font-mono uppercase">Utility</div>${admin}</div><h3 class="pv-custom-title mt-3 text-lg font-bold">${escapeHtml(m.title||'Untitled Mod')}</h3><p class="pv-custom-description mt-1 text-sm">${escapeHtml(m.description||'')}</p></div></article>`}).join(''); empty?.classList.toggle('hidden', list.length!==0);
         }
+        function insertMarkdown(startTag, endTag) {
+            const textarea = document.getElementById('modDescription');
+            if (!textarea) return;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end) || 'text';
+            textarea.value = textarea.value.substring(0, start) + startTag + selectedText + endTag + textarea.value.substring(end);
+            textarea.focus();
+        }
+
+        function normalizeHex(value) {
+            let v=(value||'').trim().toUpperCase();
+            if (!v.startsWith('#')) v='#'+v;
+            if (/^#[0-9A-F]{6}$/.test(v)) return v;
+            return null;
+        }
+        function hslToHex(h,s,l){
+            s/=100; l/=100; const k=n=>(n+h/30)%12; const a=s*Math.min(l,1-l); const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+            return '#'+[f(0),f(8),f(4)].map(x=>Math.round(255*x).toString(16).padStart(2,'0')).join('').toUpperCase();
+        }
+        function setModColor(hex){
+            const valid=normalizeHex(hex)||'#FFFFFF';
+            const color=document.getElementById('modColor'); const hexInput=document.getElementById('modColorHex'); const label=document.getElementById('modColorHexLabel'); const preview=document.getElementById('modColorPreview'); const wheel=document.getElementById('modColorWheel'); const cursor=wheel?.querySelector('.pv-color-wheel-cursor');
+            if(color) color.value=valid; if(hexInput) hexInput.value=valid; if(label) label.textContent=valid; if(preview) preview.style.background=valid; if(wheel) wheel.setAttribute('aria-valuetext',valid);
+            if(cursor){ const n=parseInt(valid.slice(1),16); const r=n>>16,g=(n>>8)&255,b=n&255; const max=Math.max(r,g,b),min=Math.min(r,g,b); const d=max-min; let h=0,s=0,l=(max+min)/510; if(d){s=d/(255-Math.abs(2*l-1)); if(max===r) h=((g-b)/d)%6; else if(max===g) h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; if(h<0)h+=1;} const rect=wheel.getBoundingClientRect(); const radius=rect.width/2; const sat=Math.max(.05,Math.min(1,s)); const angle=h*2*Math.PI-Math.PI/2; const dist=radius*.82*sat; cursor.style.left=(50+(dist/radius*100)*Math.cos(angle))+'%'; cursor.style.top=(50+(dist/radius*100)*Math.sin(angle))+'%'; }
+        }
+        function pickWheelColor(e){
+            const wheel=document.getElementById('modColorWheel'); if(!wheel) return; const rect=wheel.getBoundingClientRect(); const x=e.clientX-rect.left-rect.width/2, y=e.clientY-rect.top-rect.height/2; const radius=Math.min(rect.width,rect.height)/2; const dist=Math.min(Math.hypot(x,y),radius*.82); const hue=(Math.atan2(y,x)+Math.PI/2+Math.PI*2)%(Math.PI*2)/(Math.PI*2); const sat=Math.max(0,Math.min(1,dist/(radius*.82))); const hex=hslToHex(hue*360,sat*100,50); setModColor(hex);
+        }
+
+        // Restore the original mod upload/edit flow without changing the existing modal UI.
+        const modForm = document.getElementById('modForm');
+        document.getElementById('openUploadModalBtn')?.addEventListener('click', () => {
+            document.getElementById('modalTitle').textContent='Upload New Mod';
+            modForm?.reset();
+            document.getElementById('modId').value='';
+            setModColor('#FFFFFF');
+            pvAnimateModal(uploadModal,true);
+        });
+        document.getElementById('closeUploadModalBtn')?.addEventListener('click', () => pvAnimateModal(uploadModal,false));
+        document.getElementById('cancelUploadBtn')?.addEventListener('click', () => pvAnimateModal(uploadModal,false));
+        document.getElementById('modImageFile')?.addEventListener('change', e => { const file=e.target.files?.[0]; if(!file)return; const reader=new FileReader(); reader.onload=evt=>{document.getElementById('modImage').value=evt.target.result;}; reader.readAsDataURL(file); });
+        modForm?.addEventListener('submit', e => {
+            e.preventDefault();
+            if(!isAdmin) return;
+            const id=document.getElementById('modId').value || 'mod_'+Date.now();
+            const color=normalizeHex(document.getElementById('modColorHex').value)||'#FFFFFF';
+            const modObj={id,title:document.getElementById('modTitle').value.trim(),color,category:document.getElementById('modCategory').value,description:document.getElementById('modDescription').value.trim(),image:document.getElementById('modImage').value.trim(),hoverGif:document.getElementById('modHoverGif').value.trim(),youtubeUrl:document.getElementById('modYoutube').value.trim(),downloadUrl:document.getElementById('modDownload').value.trim()};
+            const idx=modsData.findIndex(m=>m.id===id); if(idx>=0) modsData[idx]=modObj; else modsData.unshift(modObj);
+            saveToLocal(); renderMods(); pvAnimateModal(uploadModal,false);
+        });
+        window.editMod=function(id){
+            const mod=modsData.find(m=>m.id===id); if(!mod || !isAdmin)return;
+            document.getElementById('modalTitle').textContent='Edit Mod'; document.getElementById('modId').value=mod.id; document.getElementById('modTitle').value=mod.title||''; setModColor(mod.color||'#FFFFFF'); document.getElementById('modCategory').value=mod.category||'Utility'; document.getElementById('modDescription').value=mod.description||''; document.getElementById('modImage').value=mod.image||''; document.getElementById('modHoverGif').value=mod.hoverGif||''; document.getElementById('modYoutube').value=mod.youtubeUrl||mod.youtube||''; document.getElementById('modDownload').value=mod.downloadUrl||mod.download||''; pvAnimateModal(uploadModal,true);
+        };
+        window.deleteMod=function(id){ if(!isAdmin)return; if(confirm('Delete this mod showcase?')){modsData=modsData.filter(m=>m.id!==id);saveToLocal();renderMods();} };
+
+        const modColorWheel=document.getElementById('modColorWheel');
+        modColorWheel?.addEventListener('pointerdown', e => { modColorWheel.setPointerCapture?.(e.pointerId); pickWheelColor(e); });
+        modColorWheel?.addEventListener('pointermove', e => { if(e.buttons) pickWheelColor(e); });
+        document.getElementById('modColorHex')?.addEventListener('input', e => { const v=normalizeHex(e.target.value); if(v)setModColor(v); });
+        document.getElementById('modColor')?.addEventListener('input', e => setModColor(e.target.value));
+
         function loadMods(){ try { modsData=JSON.parse(localStorage.getItem('pandavault_mods')||'[]'); } catch(e){modsData=[];} renderMods(); }
 
         // Page navigation: keep the existing sidebar UI and only switch the visible view.
