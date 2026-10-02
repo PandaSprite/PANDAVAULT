@@ -6,18 +6,18 @@
     <title>PandaVault</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <!-- Google Fonts: Google Sans Flex & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600;700;800&family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
-                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        sans: ['Google Sans Flex', 'Google Sans', 'sans-serif'],
+                        display: ['Google Sans Flex', 'Google Sans', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
@@ -38,26 +38,23 @@
         body {
             background-color: #000000;
             color: #ffffff;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Google Sans Flex', 'Google Sans', sans-serif;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Ultra-Smooth Page View Fade & Scale Transitions */
-        .page-fade-enter {
-            animation: pageFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
 
-        @keyframes pageFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px) scale(0.988);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
+        /* Native-app responsive shell: use real breakpoints instead of squeezing desktop UI into phone width. */
+        .pv-app-shell { min-height: calc(100vh - 57px); }
+        #mainViewContainer { min-width: 0; }
+        .page-fade-enter { animation: none !important; }
+        .pv-mod-header-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: stretch; }
+        .pv-mod-title-field, .pv-mod-color-field { min-width: 0; }
+        .pv-color-editor { display: flex; align-items: center; gap: 14px; min-width: 0; height: 100%; }
+        .pv-color-details { min-width: 0; flex: 1; }
+        .pv-color-wheel { width: 112px; height: 112px; flex: 0 0 112px; }
+        .pv-color-wheel-cursor { width: 15px; height: 15px; }
+        .pv-color-wheel::after { inset: 17px; }
 
         /* Card transition effects */
         .mod-card {
@@ -65,7 +62,6 @@
         }
         .mod-card:hover {
             transform: translateY(-4px);
-            border-color: #ffffff;
             box-shadow: 0 12px 32px -8px rgba(255, 255, 255, 0.12);
         }
 
@@ -112,13 +108,125 @@
             );
             background-size: 100% 3px, 6px 100%;
         }
+
+
+        /* PandaVault Enhancement Layer: preserves existing layout and palette */
+        .pv-transitioning { pointer-events: none; }
+        .pv-view-fade-out { opacity: 0; transition: opacity .12s ease; }
+        .pv-view-fade-in { animation: pvViewFadeIn .16s ease both; }
+        @keyframes pvViewFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Smooth, restrained white selection highlight for sidebar navigation */
+        #categoryNav .nav-btn { position: relative; overflow: hidden; }
+        #categoryNav .nav-btn::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 7px;
+            bottom: 7px;
+            width: 2px;
+            background: #fff;
+            border-radius: 999px;
+            opacity: 0;
+            transform: scaleY(.35);
+            transition: opacity .22s ease, transform .28s cubic-bezier(.16,1,.3,1);
+        }
+        #categoryNav .nav-btn.active::after { opacity: 1; transform: scaleY(1); }
+        #categoryNav .nav-btn.active { box-shadow: inset 0 0 0 1px rgba(255,255,255,.035); }
+
+        /* Keep modal geometry unchanged while making its appearance/disappearance smoother */
+        #passcodeModal, #uploadModal, #vercelSyncModal {
+            transition: opacity .2s ease, visibility .2s ease;
+        }
+        #passcodeModal > div, #uploadModal > div, #vercelSyncModal > div {
+            transition: opacity .22s ease, transform .22s cubic-bezier(.16,1,.3,1);
+        }
+        .pv-modal-open > div { opacity: 1; transform: translateY(0) scale(1); }
+        .pv-modal-closed > div { opacity: 0; transform: translateY(8px) scale(.985); }
+
+        /* Authentication completion dialog */
+        #authCompleteModal { opacity: 0; visibility: hidden; transition: opacity .22s ease, visibility .22s ease; }
+        #authCompleteModal.pv-show { opacity: 1; visibility: visible; }
+        #authCompleteModal .pv-auth-card { opacity: 0; transform: translateY(8px) scale(.985); transition: opacity .25s ease, transform .3s cubic-bezier(.16,1,.3,1); }
+        #authCompleteModal.pv-show .pv-auth-card { opacity: 1; transform: translateY(0) scale(1); }
+        #authCompleteModal .pv-check { animation: none; }
+        #authCompleteModal.pv-show .pv-check { animation: pvCheckPop .45s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes pvCheckPop { 0% { opacity: 0; transform: scale(.55); } 65% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* Custom color now controls card content accents without painting the card surface */
+        .mod-card .pv-custom-title { color: var(--pv-color, #fff); }
+        .mod-card .pv-custom-description { color: color-mix(in srgb, var(--pv-color, #fff) 72%, #fff 28%); }
+        .mod-card .pv-download { background-color: var(--pv-color, #fff) !important; }
+        .mod-card .pv-category { border-color: var(--pv-color, #fff) !important; color: var(--pv-color, #fff) !important; }
+
+        /* Compact HSV-style color wheel for quick card color selection. */
+        .pv-color-wheel {
+            position: relative; width: 82px; height: 82px; flex: 0 0 82px; border-radius: 50%; cursor: crosshair;
+            background: conic-gradient(#ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 2px 10px rgba(0,0,0,.35);
+            touch-action: none;
+        }
+        .pv-color-wheel::after { content:''; position:absolute; inset:13px; border-radius:50%; background:radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 72%); opacity:.82; pointer-events:none; }
+        .pv-color-wheel-cursor { position:absolute; width:13px; height:13px; border:2px solid #fff; border-radius:50%; left:50%; top:50%; transform:translate(-50%,-50%); box-shadow:0 0 0 1px rgba(0,0,0,.7); z-index:2; pointer-events:none; }
+        .pv-color-preview { display:inline-block; width:16px; height:16px; border-radius:50%; background:#fff; border:1px solid rgba(255,255,255,.35); box-shadow:0 0 0 1px rgba(0,0,0,.5); }
+
+        /* Phone: one native-looking column, never force desktop geometry into the viewport. */
+        @media (max-width: 767px) {
+            .pv-app-shell { min-height: calc(100vh - 57px); }
+            .pv-mod-header-grid { grid-template-columns: 1fr; }
+            .pv-mod-color-field { min-height: 150px; }
+            .pv-color-editor { justify-content: flex-start; }
+            .pv-color-wheel { width: 108px; height: 108px; flex-basis: 108px; }
+            #modForm { padding-left: 16px !important; padding-right: 16px !important; }
+            header { padding-left: 12px; padding-right: 12px; gap: 10px; }
+            header > div:last-child { margin-left: 0 !important; min-width: 0; }
+            header > div:last-child > div { max-width: none !important; }
+        }
+
+        /* Tablet: a real app shell with a permanent navigation rail. */
+        @media (min-width: 768px) {
+            #sidebarDrawer {
+                position: static !important;
+                transform: none !important;
+                width: 260px !important;
+                height: auto !important;
+                flex: 0 0 260px;
+            }
+            #drawerOverlay { display: none !important; }
+            #toggleDrawerBtn { display: none !important; }
+            header { padding-left: 24px; padding-right: 24px; }
+            main { min-width: 0; }
+        }
+
+        /* Tablet: give editing controls their own stable columns instead of squeezing them. */
+        @media (min-width: 768px) and (max-width: 1279px) {
+            .pv-mod-header-grid { grid-template-columns: minmax(0, 1.45fr) minmax(250px, .75fr); }
+            .pv-color-editor { align-items: center; }
+            .pv-color-wheel { width: 118px; height: 118px; flex-basis: 118px; }
+            #modForm { max-width: 920px; margin-inline: auto; }
+        }
+
+        /* Desktop: wider workspace, stable two-column editor, no stretched modal frames. */
+        @media (min-width: 1280px) {
+            .pv-mod-header-grid { grid-template-columns: minmax(0, 1.55fr) minmax(280px, .75fr); }
+            .pv-color-wheel { width: 128px; height: 128px; flex-basis: 128px; }
+            #modForm { max-width: 1040px; margin-inline: auto; }
+            #uploadModal > div { width: min(880px, calc(100vw - 48px)); max-width: 880px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .pv-view-fade-out, .pv-view-fade-in, #authCompleteModal, #authCompleteModal .pv-auth-card,
+            #passcodeModal, #uploadModal, #vercelSyncModal, #passcodeModal > div, #uploadModal > div, #vercelSyncModal > div,
+            #categoryNav .nav-btn::after { transition: none !important; animation: none !important; }
+        }
     </style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-black text-white antialiased selection:bg-white selection:text-black">
 
     <!-- TOP HEADER / MOBILE BAR -->
-    <header class="sticky top-0 z-30 bg-black/95 backdrop-blur-md border-b border-m3-surfaceVariant px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
+    <header class="sticky top-0 z-30 bg-black/95 backdrop-blur-md border-b border-m3-surfaceVariant px-4 sm:px-8 py-3 flex items-center justify-between">
+        <!-- Logo & Title Section -->
+        <div class="flex items-center space-x-3 shrink-0">
             <button id="toggleDrawerBtn" class="p-2 rounded-xl bg-m3-surface hover:bg-m3-container active:scale-95 transition text-white focus:outline-none border border-m3-border" aria-label="Toggle Navigation">
                 <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -127,11 +235,11 @@
             <span class="font-display font-bold text-xl tracking-wider text-white">PandaVault</span>
         </div>
 
-        <div class="flex items-center space-x-2">
-            <!-- Search Input -->
-            <div class="relative">
-                <input type="text" id="searchInput" placeholder="Search mods..." class="bg-m3-surface border border-m3-border text-white text-sm rounded-xl pl-9 pr-3 py-1.5 focus:outline-none focus:border-white transition w-40 sm:w-64 placeholder-gray-500">
-                <svg class="w-4 h-4 fill-current text-white absolute left-3 top-2.5" viewBox="0 0 24 24">
+        <!-- Search Input (Pushed away with generous left-margin & spacing) -->
+        <div class="flex items-center space-x-3 ml-6 sm:ml-12 flex-1 justify-end">
+            <div class="relative w-full max-w-xs sm:max-w-sm">
+                <input type="text" id="searchInput" placeholder="Search mods..." class="w-full bg-m3-surface border border-m3-border text-white text-sm rounded-xl pl-9 pr-3 py-1.5 focus:outline-none focus:border-white transition placeholder-gray-500 font-sans">
+                <svg class="w-4 h-4 fill-current text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24">
                     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
             </div>
@@ -139,7 +247,7 @@
     </header>
 
     <!-- MAIN WRAPPER (SIDEBAR + CONTENT) -->
-    <div class="flex flex-1 relative overflow-hidden">
+    <div class="pv-app-shell flex flex-1 relative overflow-hidden">
 
         <!-- SIDEBAR DRAWER OVERLAY (Mobile) -->
         <div id="drawerOverlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300"></div>
@@ -185,12 +293,12 @@
                         </button>
                     </div>
 
-                    <!-- CATEGORIES SECTION HEADER (SEPARATES HOME FROM ENGINES) -->
+                    <!-- CATEGORIES SECTION HEADER -->
                     <div class="pt-2 border-t border-m3-surfaceVariant">
                         <span class="px-3 text-[11px] font-bold tracking-widest text-gray-500 uppercase font-mono">Categories</span>
                         
                         <div class="mt-2 space-y-1">
-                            <!-- V-Slice (Backwards Baseball Cap 🧢 SVG) -->
+                            <!-- V-Slice -->
                             <button data-category="V-Slice" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
                                 <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24">
                                     <path d="M4 14C4 9.5 7.5 6 12 6C16 6 19.3 8.8 20 12.5H4.05C4.02 13 4 13.5 4 14Z"/>
@@ -209,7 +317,7 @@
                                 <span>Kade Engine</span>
                             </button>
 
-                            <!-- Psych Engine (Prism Crystal Gem) -->
+                            <!-- Psych Engine -->
                             <button data-category="Psych Engine" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
                                 <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24">
                                     <path d="M12 2L5 8l7 14 7-14-7-6zm0 3.2L16.5 8H7.5L12 5.2zM7.1 9.5h9.8L12 18.2 7.1 9.5z"/>
@@ -217,7 +325,7 @@
                                 <span>Psych Engine</span>
                             </button>
 
-                            <!-- P-Slice (Backwards Cap + Gem Hybrid) -->
+                            <!-- P-Slice -->
                             <button data-category="P-Slice" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
                                 <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24">
                                     <path d="M3 12C3 8.5 5.5 6 9 6C12 6 14.5 8 15 11H3.05C3.02 11.3 3 11.6 3 12Z"/>
@@ -227,7 +335,7 @@
                                 <span>P-Slice</span>
                             </button>
 
-                            <!-- Codename Engine (Bold Question Mark) -->
+                            <!-- Codename Engine -->
                             <button data-category="Codename Engine" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
                                 <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24">
                                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
@@ -238,18 +346,18 @@
                     </div>
                 </nav>
 
-                <!-- CREATOR MANAGEMENT ACTIONS (ADMIN UNLOCKED) -->
+                <!-- CREATOR MANAGEMENT ACTIONS -->
                 <div id="adminSidebarSection" class="hidden border-t border-m3-surfaceVariant pt-4 space-y-2 font-mono">
                     <span class="px-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">[ CREATOR CONTROL ]</span>
                     
-                    <button id="openUploadModalBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 active:scale-98 transition text-xs">
+                    <button id="openUploadModalBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 active:scale-98 transition text-xs font-sans">
                         <svg class="w-4 h-4 fill-current text-black" viewBox="0 0 24 24">
                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                         </svg>
                         <span>UPLOAD MOD</span>
                     </button>
 
-                    <button id="openVercelSyncBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-m3-surface border border-m3-border text-white text-[11px] font-medium rounded-xl hover:bg-m3-container transition">
+                    <button id="openVercelSyncBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-m3-surface border border-m3-border text-white text-[11px] font-medium rounded-xl hover:bg-m3-container transition font-sans">
                         <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
                             <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
                         </svg>
@@ -289,9 +397,24 @@
 
             <!-- PAGE FOOTER -->
             <footer class="mt-16 pt-6 border-t border-m3-surfaceVariant/50 text-center">
-                <p class="text-[11px] tracking-widest text-white/40 uppercase font-medium">Created By PandaSprite</p>
+                <p class="text-[11px] tracking-widest text-white/40 uppercase font-medium font-sans">Created By PandaSprite</p>
             </footer>
         </main>
+    </div>
+
+    <!-- MODAL: AUTHENTICATION COMPLETE -->
+    <div id="authCompleteModal" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-md hidden items-center justify-center p-4" aria-hidden="true">
+        <div class="pv-auth-card bg-m3-surface border border-m3-border rounded-2xl w-full max-w-sm p-7 shadow-2xl text-center">
+            <div class="pv-check mx-auto w-14 h-14 rounded-full border border-green-400/30 bg-green-400/10 flex items-center justify-center mb-5">
+                <svg class="w-7 h-7 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">Authentication Complete</h3>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">Creator access has been verified successfully.</p>
+            <button id="confirmAuthBtn" type="button" class="mt-6 inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl border border-green-400/30 bg-green-400/10 text-green-400 font-semibold text-sm hover:bg-green-400/15 transition active:scale-95">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>
+                <span>Confirm</span>
+            </button>
+        </div>
     </div>
 
     <!-- MODAL: UPLOAD / EDIT MOD -->
@@ -304,13 +427,33 @@
                 </button>
             </div>
 
-            <form id="modForm" class="p-6 space-y-4 overflow-y-auto flex-1">
+            <form id="modForm" class="p-6 space-y-4 overflow-y-auto flex-1 font-sans">
                 <input type="hidden" id="modId">
 
-                <!-- Title -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Mod Title *</label>
-                    <input type="text" id="modTitle" required placeholder="e.g., Vs. Impostor V4" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-white transition">
+                <!-- Title & Custom Card Color Row -->
+                <div class="pv-mod-header-grid">
+                    <div class="pv-mod-title-field">
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Mod Title *</label>
+                        <input type="text" id="modTitle" required placeholder="e.g., Vs. Impostor V4" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-white transition">
+                    </div>
+                    <div class="pv-mod-color-field">
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Card Color</label>
+                        <div class="bg-black border border-m3-border rounded-xl p-3 h-full">
+                            <div class="pv-color-editor">
+                                <div id="modColorWheel" class="pv-color-wheel" role="slider" aria-label="Choose card color" aria-valuetext="#FFFFFF" tabindex="0">
+                                    <div class="pv-color-wheel-cursor"></div>
+                                </div>
+                                <div class="pv-color-details">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span id="modColorPreview" class="pv-color-preview"></span>
+                                        <span id="modColorHexLabel" class="text-xs font-mono uppercase text-white">#FFFFFF</span>
+                                    </div>
+                                    <input type="text" id="modColorHex" value="#ffffff" aria-label="Card color hex value" class="w-full bg-transparent border border-m3-border rounded-lg px-2.5 py-2 text-xs font-mono uppercase text-white focus:outline-none focus:border-white transition">
+                                    <input type="color" id="modColor" value="#ffffff" class="sr-only">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Category -->
@@ -342,12 +485,19 @@
 
                 <!-- Image URL or Local File -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Thumbnail / Image URL *</label>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Cover Image URL / Base *</label>
                     <input type="text" id="modImage" required placeholder="https://imgur.com/... or https://i.ytimg.com/vi/..." class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-white transition mb-2">
                     <div class="flex items-center space-x-2">
                         <span class="text-xs text-gray-500">or select local file:</span>
                         <input type="file" id="modImageFile" accept="image/*" class="text-xs text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:bg-m3-container file:text-white hover:file:bg-m3-surface">
                     </div>
+                </div>
+
+                <!-- Hover Media GIF or YouTube Preview -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Hover GIF URL (Optional)</label>
+                    <input type="text" id="modHoverGif" placeholder="https://media.giphy.com/... (Leaves YouTube preview if empty)" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-white transition">
+                    <p class="text-[10px] text-gray-500 mt-1">* If left blank, hovering over the image card will automatically play a YouTube video preview!</p>
                 </div>
 
                 <!-- YouTube Link -->
@@ -371,7 +521,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ADVANCED HACKER TERMINAL CREATOR VERIFICATION -->
+    <!-- MODAL: ADVANCED TERMINAL CREATOR VERIFICATION -->
     <div id="passcodeModal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg hidden flex items-center justify-center p-4">
         <div class="bg-black border border-white/20 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.1)] terminal-overlay font-mono relative">
             
@@ -418,7 +568,7 @@
 
     <!-- MODAL: VERCEL / GITHUB JSON SYNC PANEL -->
     <div id="vercelSyncModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-m3-surface border border-m3-border rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+        <div class="bg-m3-surface border border-m3-border rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4 font-sans">
             <div class="flex items-center justify-between border-b border-m3-surfaceVariant pb-3">
                 <h3 class="font-display font-bold text-lg text-white">Vercel & GitHub Sync</h3>
                 <button id="closeVercelSyncModalBtn" class="text-gray-400 hover:text-white p-1 rounded-lg">
@@ -431,7 +581,7 @@
             </p>
 
             <div class="space-y-3 pt-2 font-mono">
-                <button id="downloadJsonBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition text-xs">
+                <button id="downloadJsonBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition text-xs font-sans">
                     <svg class="w-4 h-4 fill-current text-black" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                     <span>DOWNLOAD MODS.JSON</span>
                 </button>
@@ -444,7 +594,7 @@
 
                 <textarea id="jsonImportArea" rows="4" placeholder="Paste mods.json content here..." class="w-full bg-black border border-m3-border rounded-xl p-3 text-xs font-mono text-white focus:outline-none focus:border-white transition"></textarea>
 
-                <div class="flex items-center justify-between space-x-2">
+                <div class="flex items-center justify-between space-x-2 font-sans">
                     <button id="copyJsonBtn" class="px-3 py-2 bg-m3-surface border border-m3-border text-gray-300 hover:text-white rounded-xl text-xs transition">Copy JSON</button>
                     <button id="importJsonBtn" class="px-4 py-2 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition text-xs">Import & Save</button>
                 </div>
@@ -460,6 +610,168 @@
         let searchQuery = '';
         let isAdmin = false;
         const DEFAULT_PASSCODE = 'admin123';
+
+        // Color wheel state and helpers.
+        let pvColorHue = 0;
+        let pvColorSaturation = 1;
+        let pvColorValue = 1;
+        function pvHsvToHex(h, s, v) {
+            const f = (n, k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
+            return '#' + [f(5), f(3), f(1)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+        function pvHexToHsv(hex) {
+            const n = parseInt(hex.replace('#',''), 16);
+            let r=((n>>16)&255)/255,g=((n>>8)&255)/255,b=(n&255)/255;
+            const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+            let h=0; if(d){ if(max===r) h=60*((g-b)/d%6); else if(max===g) h=60*((b-r)/d+2); else h=60*((r-g)/d+4); }
+            if(h<0) h+=360; const s=max===0?0:d/max; return [h,s,max];
+        }
+        function pvSetColor(hex, updateWheel=true) {
+            if(!/^#[0-9a-f]{6}$/i.test(hex)) return;
+            hex=hex.toUpperCase();
+            const color=document.getElementById('modColor'); const text=document.getElementById('modColorHex');
+            const label=document.getElementById('modColorHexLabel'); const preview=document.getElementById('modColorPreview');
+            if(color) color.value=hex; if(text && text.value!==hex) text.value=hex; if(label) label.textContent=hex; if(preview) preview.style.background=hex;
+            if(updateWheel){ [pvColorHue,pvColorSaturation,pvColorValue]=pvHexToHsv(hex); pvUpdateWheelCursor(); }
+        }
+        function pvUpdateWheelCursor(){
+            const wheel=document.getElementById('modColorWheel'), cursor=wheel?.querySelector('.pv-color-wheel-cursor'); if(!wheel||!cursor) return;
+            const angle=(pvColorHue-90)*Math.PI/180;
+            cursor.style.left=(50+(Math.cos(angle)*pvColorSaturation)*50)+'%'; cursor.style.top=(50+(Math.sin(angle)*pvColorSaturation)*50)+'%';
+        }
+        function pvPickWheel(e){
+            const wheel=document.getElementById('modColorWheel'); if(!wheel) return; const rect=wheel.getBoundingClientRect();
+            const x=e.clientX-rect.left-rect.width/2, y=e.clientY-rect.top-rect.height/2; const radius=Math.min(rect.width,rect.height)/2;
+            const dist=Math.min(Math.hypot(x,y),radius); pvColorSaturation=dist/radius; pvColorHue=(Math.atan2(y,x)*180/Math.PI+90+360)%360;
+            pvSetColor(pvHsvToHex(pvColorHue,pvColorSaturation,pvColorValue),false); pvUpdateWheelCursor();
+            const wheelEl=document.getElementById('modColorWheel'); if(wheelEl) wheelEl.setAttribute('aria-valuetext',pvHsvToHex(pvColorHue,pvColorSaturation,pvColorValue));
+        }
+
+        // Native Web Audio feedback. Keep the sound path synchronous after the audio context is unlocked.
+        let pvAudioContext = null;
+        let pvAudioReady = false;
+        function pvGetAudio() {
+            if (!pvAudioContext) {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return null;
+                pvAudioContext = new Ctx({ latencyHint: 'interactive' });
+            }
+            return pvAudioContext;
+        }
+        function pvUnlockAudio() {
+            const ctx = pvGetAudio();
+            if (!ctx) return Promise.resolve(null);
+            if (ctx.state === 'running') { pvAudioReady = true; return Promise.resolve(ctx); }
+            return ctx.resume().then(() => { pvAudioReady = ctx.state === 'running'; return ctx; }).catch(() => null);
+        }
+        function pvTone(type = 'click') {
+            const ctx = pvGetAudio();
+            if (!ctx || ctx.state !== 'running') return;
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.type = type === 'error' ? 'triangle' : 'sine';
+            const settings = {
+                click: [620, 0.055, 0.20],
+                success: [660, 0.16, 0.30],
+                error: [170, 0.15, 0.25]
+            }[type] || [520, 0.045, 0.025];
+            osc.frequency.setValueAtTime(settings[0], now);
+            if (type === 'success') osc.frequency.exponentialRampToValueAtTime(880, now + settings[1]);
+            if (type === 'error') osc.frequency.exponentialRampToValueAtTime(95, now + settings[1]);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(settings[2], now + 0.002);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + settings[1]);
+            osc.start(now); osc.stop(now + settings[1] + 0.008);
+
+            if (type !== 'error') {
+                const hi = ctx.createOscillator();
+                const hiGain = ctx.createGain();
+                hi.type = 'triangle';
+                hi.frequency.setValueAtTime(settings[0] * 2, now);
+                hiGain.gain.setValueAtTime(0.0001, now);
+                hiGain.gain.exponentialRampToValueAtTime(settings[2] * 0.20, now + 0.002);
+                hiGain.gain.exponentialRampToValueAtTime(0.0001, now + settings[1]);
+                hi.connect(hiGain); hiGain.connect(ctx.destination);
+                hi.start(now); hi.stop(now + settings[1] + 0.008);
+            }
+        }
+        function pvPlaySuccess() {
+            pvTone('success');
+            window.setTimeout(() => pvTone('success'), 70);
+        }
+        function pvPlayError() { pvTone('error'); }
+
+        // Small visual press feedback without changing existing dimensions.
+        document.addEventListener('pointerdown', (e) => {
+            const button = e.target.closest('button');
+            if (button && !button.disabled) {
+                button.animate([
+                    { transform: 'scale(1)' },
+                    { transform: 'scale(.975)' },
+                    { transform: 'scale(1)' }
+                ], { duration: 145, easing: 'cubic-bezier(.16,1,.3,1)' });
+                // Unlock once on the user's first real interaction, then play directly on every press.
+                if (!pvAudioReady) {
+                    pvUnlockAudio().then(() => pvTone('click'));
+                } else {
+                    pvTone('click');
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const wheel=document.getElementById('modColorWheel'), color=document.getElementById('modColor'), text=document.getElementById('modColorHex');
+            if(!wheel) return;
+            wheel.addEventListener('pointerdown', e => { wheel.setPointerCapture?.(e.pointerId); pvPickWheel(e); });
+            wheel.addEventListener('pointermove', e => { if(e.buttons) pvPickWheel(e); });
+            color?.addEventListener('input', e => pvSetColor(e.target.value));
+            text?.addEventListener('change', e => { let v=e.target.value.trim(); if(!v.startsWith('#')) v='#'+v; if(/^#[0-9a-f]{6}$/i.test(v)) pvSetColor(v); else pvSetColor('#FFFFFF'); });
+            pvSetColor(color?.value || '#FFFFFF');
+        });
+
+        function pvAnimateModal(modal, show) {
+            if (!modal) return;
+            if (show) {
+                modal.classList.remove('hidden', 'pv-modal-closed');
+                modal.classList.add('flex', 'pv-modal-open');
+                modal.setAttribute('aria-hidden', 'false');
+            } else {
+                modal.classList.remove('pv-modal-open');
+                modal.classList.add('pv-modal-closed');
+                modal.setAttribute('aria-hidden', 'true');
+                window.setTimeout(() => {
+                    if (!modal.classList.contains('pv-modal-open')) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                }, 210);
+            }
+        }
+
+        function showAuthComplete() {
+            const modal = document.getElementById('authCompleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            requestAnimationFrame(() => modal.classList.add('pv-show'));
+            modal.setAttribute('aria-hidden', 'false');
+            pvPlaySuccess();
+        }
+        function closeAuthComplete() {
+            const modal = document.getElementById('authCompleteModal');
+            modal.classList.remove('pv-show');
+            modal.setAttribute('aria-hidden', 'true');
+            window.setTimeout(() => { if (!modal.classList.contains('pv-show')) { modal.classList.add('hidden'); modal.classList.remove('flex'); } }, 230);
+        }
+
+        // Extract YouTube Video ID from standard YouTube URL
+        function getYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
 
         // Markdown Formatter Helper
         function parseMarkdown(text) {
@@ -494,6 +806,17 @@
             textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
             textarea.focus();
         }
+
+        // Color Sync in Modal Inputs
+        const modColorPicker = document.getElementById('modColor');
+        const modColorHex = document.getElementById('modColorHex');
+
+        modColorPicker.addEventListener('input', (e) => modColorHex.value = e.target.value.toUpperCase());
+        modColorHex.addEventListener('input', (e) => {
+            if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                modColorPicker.value = e.target.value;
+            }
+        });
 
         // Initialize Application Data
         async function initApp() {
@@ -536,6 +859,21 @@
             localStorage.setItem('pandavault_mods', JSON.stringify(modsData));
         }
 
+        // Smooth page traversal wrapper. Rendering itself remains unchanged.
+        let pvRenderTimer = null;
+        function pvRenderMods() {
+            const view = document.getElementById('mainViewContainer');
+            if (!view) return renderMods();
+            if (pvRenderTimer) clearTimeout(pvRenderTimer);
+            view.classList.remove('pv-view-fade-in');
+            view.classList.add('pv-view-fade-out');
+            pvRenderTimer = setTimeout(() => {
+                renderMods();
+                view.classList.remove('pv-view-fade-out');
+                view.classList.add('pv-view-fade-in');
+            }, 85);
+        }
+
         // Render Cards Grid
         function renderMods() {
             const grid = document.getElementById('modGrid');
@@ -550,11 +888,6 @@
                 return matchesCat && matchesSearch;
             });
 
-            // Trigger Smooth View Fade
-            mainViewContainer.classList.remove('page-fade-enter');
-            void mainViewContainer.offsetWidth; // Trigger reflow
-            mainViewContainer.classList.add('page-fade-enter');
-
             grid.innerHTML = '';
 
             if (filtered.length === 0) {
@@ -566,15 +899,46 @@
 
             filtered.forEach(mod => {
                 const card = document.createElement('div');
-                card.className = "mod-card bg-m3-surface border border-m3-border rounded-[20px] overflow-hidden flex flex-col justify-between relative group";
+                const customColor = mod.color || '#FFFFFF';
+                const youtubeId = getYouTubeId(mod.youtubeUrl);
+                const hoverGif = mod.hoverGif || '';
+
+                card.className = "mod-card bg-m3-surface border border-m3-border rounded-[20px] overflow-hidden flex flex-col justify-between relative group font-sans";
+                card.style.borderColor = "rgba(255,255,255,0.1)";
+                card.style.setProperty("--pv-color", customColor);
+
+                // Custom dynamic hover color logic
+                card.onmouseenter = () => card.style.borderColor = customColor;
+                card.onmouseleave = () => card.style.borderColor = "rgba(255,255,255,0.1)";
+
+                // Build Media Hover Container (GIF vs YouTube Preview)
+                let mediaHoverHTML = '';
+                if (hoverGif) {
+                    // Custom GIF Hover Mode
+                    mediaHoverHTML = `
+                        <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:opacity-0 transition duration-300 absolute inset-0 z-10" loading="lazy">
+                        <img src="${hoverGif}" alt="${mod.title} Hover" class="w-full h-full object-cover absolute inset-0 z-0 opacity-100" loading="lazy">
+                    `;
+                } else if (youtubeId) {
+                    // YouTube Preview Embed Hover Mode
+                    mediaHoverHTML = `
+                        <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:opacity-0 transition duration-300 absolute inset-0 z-10" loading="lazy">
+                        <iframe class="w-full h-full absolute inset-0 z-0 pointer-events-none scale-125" src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1" title="YouTube preview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                    `;
+                } else {
+                    // Fallback Static Image
+                    mediaHoverHTML = `
+                        <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:scale-105 transition duration-500" loading="lazy">
+                    `;
+                }
 
                 card.innerHTML = `
                     <div>
                         <!-- Thumbnail Clickable Image (Redirects to YouTube) -->
                         <a href="${mod.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="block relative aspect-video bg-m3-container overflow-hidden group/img">
-                            <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:scale-105 transition duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop'">
-                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition duration-300 flex items-center justify-center">
-                                <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transform scale-90 group-hover/img:scale-100 transition duration-300">
+                            ${mediaHoverHTML}
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition duration-300 flex items-center justify-center z-20">
+                                <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-xl transform scale-90 group-hover/img:scale-100 transition duration-300">
                                     <svg class="w-6 h-6 fill-current text-black ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                 </div>
                             </div>
@@ -582,13 +946,13 @@
 
                         <!-- Card Body -->
                         <div class="p-5">
-                            <h3 class="font-display font-bold text-base text-white mb-2 leading-snug">${escapeHtml(mod.title)}</h3>
-                            <div class="text-xs text-gray-400 leading-relaxed markdown-content max-h-28 overflow-y-auto pr-1">
+                            <h3 class="pv-custom-title font-display font-bold text-base mb-2 leading-snug">${escapeHtml(mod.title)}</h3>
+                            <div class="pv-custom-description text-xs leading-relaxed markdown-content max-h-28 overflow-y-auto pr-1 font-sans">
                                 ${parseMarkdown(mod.description || '')}
                             </div>
-                            <!-- Category Badge (Moved to bottom of title/description) -->
-                            <div class="mt-3">
-                                <span class="inline-block bg-black text-white text-[10px] font-semibold tracking-wider px-3 py-1 rounded-full border border-m3-border">
+                            <!-- Category Badge (Positioned below description area) -->
+                            <div class="mt-4">
+                                <span class="pv-category inline-block text-xs font-semibold tracking-wide px-3 py-1 rounded-full border transition-colors" style="background-color: #000000;">
                                     ${mod.category}
                                 </span>
                             </div>
@@ -598,8 +962,8 @@
                     <!-- Footer Actions -->
                     <div class="px-5 pb-5 pt-2 flex items-center justify-between border-t border-m3-surfaceVariant/50 mt-2">
                         <!-- Direct Download Button -->
-                        <a href="${mod.downloadUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 flex items-center justify-center space-x-2 bg-white hover:bg-gray-200 text-black font-bold text-xs py-2.5 px-4 rounded-xl transition active:scale-98">
-                            <svg class="w-4 h-4 fill-current text-black" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        <a href="${mod.downloadUrl}" target="_blank" rel="noopener noreferrer" class="pv-download flex-1 flex items-center justify-center space-x-2 font-bold text-xs py-2.5 px-4 rounded-xl transition active:scale-98 shadow-md" style="color: ${getContrastYIQ(customColor)};">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                             <span>DOWNLOAD</span>
                         </a>
 
@@ -619,6 +983,19 @@
 
                 grid.appendChild(card);
             });
+        }
+
+        // Helper to contrast dark vs light text color over custom card button color
+        function getContrastYIQ(hexcolor){
+            hexcolor = hexcolor.replace("#", "");
+            if (hexcolor.length === 3) {
+                hexcolor = hexcolor.split('').map(c => c + c).join('');
+            }
+            const r = parseInt(hexcolor.substr(0,2),16);
+            const g = parseInt(hexcolor.substr(2,2),16);
+            const b = parseInt(hexcolor.substr(4,2),16);
+            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return (yiq >= 128) ? '#000000' : '#FFFFFF';
         }
 
         function escapeHtml(str) {
@@ -649,16 +1026,16 @@
                 btn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-m3-surface', 'font-medium');
 
                 currentCategory = btn.getAttribute('data-category');
-                renderMods();
+                pvRenderMods();
 
-                if (window.innerWidth < 1024) toggleDrawer();
+                if (window.innerWidth < 768) toggleDrawer();
             });
         });
 
         // Search Input
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchQuery = e.target.value.trim();
-            renderMods();
+            pvRenderMods();
         });
 
         // CREATOR TERMINAL ACCESS
@@ -684,13 +1061,13 @@
                     renderMods();
                 }
             } else {
-                document.getElementById('passcodeModal').classList.remove('hidden');
+                pvAnimateModal(document.getElementById('passcodeModal'), true);
                 document.getElementById('passcodeInput').focus();
             }
         });
 
         function closeTerminalModal() {
-            document.getElementById('passcodeModal').classList.add('hidden');
+            pvAnimateModal(document.getElementById('passcodeModal'), false);
             document.getElementById('passcodeError').classList.add('hidden');
             document.getElementById('passcodeInput').value = '';
         }
@@ -704,8 +1081,13 @@
             if (val === DEFAULT_PASSCODE) {
                 closeTerminalModal();
                 enableAdminMode();
+                showAuthComplete();
             } else {
                 document.getElementById('passcodeError').classList.remove('hidden');
+                pvPlayError();
+                const input = document.getElementById('passcodeInput');
+                input.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:220});
+                input.focus();
             }
         });
 
@@ -716,12 +1098,14 @@
         document.getElementById('openUploadModalBtn').addEventListener('click', () => {
             document.getElementById('modalTitle').textContent = 'Upload New Mod';
             modForm.reset();
+            document.getElementById('modColor').value = '#FFFFFF';
+            document.getElementById('modColorHex').value = '#FFFFFF';
             document.getElementById('modId').value = '';
-            uploadModal.classList.remove('hidden');
+            pvAnimateModal(uploadModal, true);
         });
 
-        document.getElementById('closeUploadModalBtn').addEventListener('click', () => uploadModal.classList.add('hidden'));
-        document.getElementById('cancelUploadBtn').addEventListener('click', () => uploadModal.classList.add('hidden'));
+        document.getElementById('closeUploadModalBtn').addEventListener('click', () => pvAnimateModal(uploadModal, false));
+        document.getElementById('cancelUploadBtn').addEventListener('click', () => pvAnimateModal(uploadModal, false));
 
         document.getElementById('modImageFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -738,14 +1122,16 @@
             e.preventDefault();
             const id = document.getElementById('modId').value || 'mod_' + Date.now();
             const title = document.getElementById('modTitle').value.trim();
+            const color = document.getElementById('modColorHex').value.trim() || '#ffffff';
             const category = document.getElementById('modCategory').value;
             const description = document.getElementById('modDescription').value.trim();
             const image = document.getElementById('modImage').value.trim();
+            const hoverGif = document.getElementById('modHoverGif').value.trim();
             const youtubeUrl = document.getElementById('modYoutube').value.trim();
             const downloadUrl = document.getElementById('modDownload').value.trim();
 
             const existingIndex = modsData.findIndex(m => m.id === id);
-            const modObj = { id, title, category, description, image, youtubeUrl, downloadUrl };
+            const modObj = { id, title, color, category, description, image, hoverGif, youtubeUrl, downloadUrl };
 
             if (existingIndex >= 0) {
                 modsData[existingIndex] = modObj;
@@ -755,7 +1141,7 @@
 
             saveToLocal();
             renderMods();
-            uploadModal.classList.add('hidden');
+            pvAnimateModal(uploadModal, false);
         });
 
         window.editMod = function(id) {
@@ -764,12 +1150,15 @@
             document.getElementById('modalTitle').textContent = 'Edit Mod';
             document.getElementById('modId').value = mod.id;
             document.getElementById('modTitle').value = mod.title;
+            document.getElementById('modColor').value = mod.color || '#FFFFFF';
+            document.getElementById('modColorHex').value = mod.color || '#FFFFFF';
             document.getElementById('modCategory').value = mod.category;
             document.getElementById('modDescription').value = mod.description || '';
             document.getElementById('modImage').value = mod.image;
+            document.getElementById('modHoverGif').value = mod.hoverGif || '';
             document.getElementById('modYoutube').value = mod.youtubeUrl;
             document.getElementById('modDownload').value = mod.downloadUrl;
-            uploadModal.classList.remove('hidden');
+            pvAnimateModal(uploadModal, true);
         };
 
         window.deleteMod = function(id) {
@@ -784,9 +1173,9 @@
         const vercelSyncModal = document.getElementById('vercelSyncModal');
         document.getElementById('openVercelSyncBtn').addEventListener('click', () => {
             document.getElementById('jsonImportArea').value = JSON.stringify(modsData, null, 2);
-            vercelSyncModal.classList.remove('hidden');
+            pvAnimateModal(vercelSyncModal, true);
         });
-        document.getElementById('closeVercelSyncModalBtn').addEventListener('click', () => vercelSyncModal.classList.add('hidden'));
+        document.getElementById('closeVercelSyncModalBtn').addEventListener('click', () => pvAnimateModal(vercelSyncModal, false));
 
         document.getElementById('downloadJsonBtn').addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(modsData, null, 2));
@@ -811,7 +1200,7 @@
                     modsData = parsed;
                     saveToLocal();
                     renderMods();
-                    vercelSyncModal.classList.add('hidden');
+                    pvAnimateModal(vercelSyncModal, false);
                     alert('Successfully imported mod data!');
                 } else {
                     alert('Invalid JSON format.');
@@ -821,12 +1210,16 @@
             }
         });
 
+        document.getElementById('confirmAuthBtn').addEventListener('click', closeAuthComplete);
+        document.getElementById('authCompleteModal').addEventListener('click', (e) => { if (e.target.id === 'authCompleteModal') closeAuthComplete(); });
+
         // Global Keyboard Shortcut: ESC closes modals
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeTerminalModal();
-                uploadModal.classList.add('hidden');
-                vercelSyncModal.classList.add('hidden');
+                pvAnimateModal(uploadModal, false);
+                pvAnimateModal(vercelSyncModal, false);
+                closeAuthComplete();
             }
         });
 
