@@ -261,7 +261,7 @@
             <!-- Terminal / Access Button -->
             <div class="p-4 border-t border-m3-surfaceVariant font-mono">
                 <button id="openPasscodeModalBtn" class="w-full flex items-center justify-between px-3.5 py-2.5 bg-m3-surface border border-m3-border rounded-xl text-xs text-gray-400 hover:text-white hover:bg-m3-container transition">
-                    <span id="accessStatusLabel">[&gt;] CREATOR ACCESS</span>
+                    <span id="accessStatusLabel">[&gt;] CREATOR TERMINAL</span>
                     <span id="accessStatusDot" class="w-2 h-2 rounded-full bg-gray-600"></span>
                 </button>
             </div>
@@ -578,10 +578,6 @@
                                     <svg class="w-6 h-6 fill-current text-black ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                 </div>
                             </div>
-                            <!-- Category Badge -->
-                            <span class="absolute top-3 left-3 bg-black/90 backdrop-blur-md text-white text-[10px] font-semibold tracking-wider px-2.5 py-1 rounded-full border border-m3-border">
-                                ${mod.category}
-                            </span>
                         </a>
 
                         <!-- Card Body -->
@@ -589,6 +585,12 @@
                             <h3 class="font-display font-bold text-base text-white mb-2 leading-snug">${escapeHtml(mod.title)}</h3>
                             <div class="text-xs text-gray-400 leading-relaxed markdown-content max-h-28 overflow-y-auto pr-1">
                                 ${parseMarkdown(mod.description || '')}
+                            </div>
+                            <!-- Category Badge (Moved to bottom of title/description) -->
+                            <div class="mt-3">
+                                <span class="inline-block bg-black text-white text-[10px] font-semibold tracking-wider px-3 py-1 rounded-full border border-m3-border">
+                                    ${mod.category}
+                                </span>
                             </div>
                         </div>
                     </div>
