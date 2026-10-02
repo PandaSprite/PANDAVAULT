@@ -228,12 +228,56 @@
             #uploadModal > div { width: min(880px, calc(100vw - 48px)); max-width: 880px; }
         }
 
+        body.pv-light { background:#f4f7fb !important; color:#172333 !important; }
+        body.pv-light header, body.pv-light #sidebarDrawer, body.pv-light .pv-panel { background:#ffffff !important; color:#172333 !important; }
+        body.pv-light main { background:#f4f7fb !important; }
+        body.pv-light .text-white { color:#172333 !important; }
+        body.pv-light .text-gray-400 { color:#5c6b7a !important; }
+        body.pv-light .text-gray-500 { color:#6f7d8c !important; }
+        body.pv-light .bg-black { background:#ffffff !important; }
+        body.pv-light .bg-m3-surface { background:#eef5fb !important; }
+        body.pv-light .bg-m3-container { background:#e3eef7 !important; }
+        body.pv-light .border-m3-border, body.pv-light .border-m3-surfaceVariant { border-color:#d2dde7 !important; }
+        body.pv-light input, body.pv-light textarea, body.pv-light select { background:#ffffff !important; color:#172333 !important; border-color:#d2dde7 !important; }
+        body.pv-light .theme-toggle-knob { transform:translateX(20px); }
+        body.pv-light #themeToggle { background:#172333; }
+        body.pv-light #themeModeLabel { color:#5c6b7a; }
+        #themeToggle, #soundToggle { cursor:pointer; }
+        #soundToggle[aria-checked="false"] { opacity:.72; }
+        #soundToggle[aria-checked="true"] .sound-toggle-knob { transform:translateX(20px); }
+
         @media (prefers-reduced-motion: reduce) {
             .pv-view-fade-out, .pv-view-fade-in, #authCompleteModal, #authCompleteModal .pv-auth-card,
             #passcodeModal, #uploadModal, #vercelSyncModal, #passcodeModal > div, #uploadModal > div, #vercelSyncModal > div,
             #categoryNav .nav-btn::after { transition: none !important; animation: none !important; }
         }
-    </style>
+
+        .pv-page { min-height: 100%; }
+        .pv-panel { background:#0a0a0a; border:1px solid #333; border-radius:20px; }
+        .pv-label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:#888; margin-bottom:6px; font-weight:700; }
+        .pv-input { width:100%; background:#000; border:1px solid #333; border-radius:12px; padding:11px 13px; color:#fff; outline:none; }
+        .pv-input:focus { border-color:#fff; }
+        .rich-btn { padding:7px 10px; border-radius:9px; border:1px solid #333; background:#141414; color:#ddd; font-size:12px; font-weight:600; }
+        .rich-btn:hover { background:#222; color:#fff; }
+        .pv-editor-surface { min-height:360px; background:#000; border:1px solid #333; border-radius:14px; padding:18px; outline:none; line-height:1.7; }
+        .pv-editor-surface:focus { border-color:#fff; }
+        .pv-rich-content h1 { font-size:2rem; line-height:1.15; font-weight:800; margin:0 0 1rem; }
+        .pv-rich-content h2 { font-size:1.5rem; line-height:1.2; font-weight:800; margin:1.5rem 0 .7rem; }
+        .pv-rich-content h3 { font-size:1.15rem; line-height:1.25; font-weight:750; margin:1.25rem 0 .5rem; }
+        .pv-rich-content p { margin:.65rem 0; color:#ddd; }
+        .pv-rich-content ul,.pv-rich-content ol { padding-left:1.5rem; margin:.7rem 0; }
+        .pv-rich-content a { color:#8fd8ff; text-decoration:underline; }
+        .pv-rich-content blockquote { border-left:3px solid #555; padding-left:1rem; color:#aaa; margin:1rem 0; }
+        @media (min-width:768px) { #mainViewContainer { padding-left:1rem; padding-right:1rem; } }
+        @media (min-width:1280px) { #mainViewContainer { padding-left:2rem; padding-right:2rem; } }
+        body.pv-compact #modGrid { gap:12px; }
+
+    
+        .pv-about-card{position:relative;}
+        .pv-about-card .pv-card-actions{display:none;}
+        .pv-about-card:hover .pv-card-actions,.pv-about-card:focus-within .pv-card-actions{display:flex;}
+        .pv-wip{letter-spacing:.02em;}
+</style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-black text-white antialiased selection:bg-white selection:text-black">
 
@@ -248,12 +292,6 @@
             </button>
             <span class="font-display font-bold text-xl tracking-wider text-white">PandaVault</span>
         </div>
-
-        <!-- Desktop / Tablet Creator Terminal -->
-        <button id="desktopCreatorTerminalBtn" type="button" class="hidden md:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-m3-surface border border-m3-border text-xs font-semibold text-gray-300 hover:text-white hover:bg-m3-container transition shrink-0" aria-label="Open Creator Terminal">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4V5zm2 2v10h12V7H6zm2 2 3 3-3 3 1.4 1.4L14.8 12 9.4 6.6 8 8l3 3-3 3 1.4 1.4L13.8 12 8.6 6.6 8 8z"/></svg>
-            <span>CREATOR TERMINAL</span>
-        </button>
 
         <!-- Search Input (Pushed away with generous left-margin & spacing) -->
         <div class="flex items-center space-x-3 ml-6 sm:ml-12 flex-1 justify-end">
@@ -300,19 +338,19 @@
                     </div>
                 </div>
 
-                <!-- NAVIGATION -->
-                <nav class="space-y-4" id="categoryNav">
-                    
-                    <!-- HOME BUTTON -->
-                    <div>
-                        <button data-category="ALL" class="nav-btn active w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-white bg-m3-container border border-m3-border">
-                            <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24">
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                            </svg>
-                            <span>Home</span>
-                        </button>
-                    </div>
+                <!-- PAGE NAVIGATION -->
+                <nav class="space-y-1" id="pageNav">
+                    <span class="px-3 text-[10px] font-bold tracking-widest text-gray-500 uppercase font-mono">Pages</span>
+                    <button data-page="home" class="nav-btn active w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition text-white bg-m3-container border border-m3-border"><svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M12 3 3 10v10h6v-6h6v6h6V10l-9-7z"/></svg><span>Home</span></button>
+                    <button data-page="utility" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface"><svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.7 7.7 0 0 0-1.7-1L15 3h-4l-.3 2a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.7 7.7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.7 7.7 0 0 0 1.7 1l.3 2h4l.3-2a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5zM13 14h-2v-2h2v2z"/></svg><span>Utility</span></button>
+                    <button data-page="converter" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface"><svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M7 7h8.6L13 4.4 14.4 3 19 7.6l-4.6 4.6-1.4-1.4 2.6-2.8H7V7zm10 10H8.4l2.6 2.6-1.4 1.4L5 16.4l4.6-4.6 1.4 1.4L8.4 16H17v1z"/></svg><span>Converter</span></button>
+                    <button data-page="settings" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface"><svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.7 7.7 0 0 0-1.7-1L15 3h-4l-.3 2a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.7 7.7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.7 7.7 0 0 0 1.7 1l.3 2h4l.3-2a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5zM13 14h-2v-2h2v2z"/></svg><span>Settings</span></button>
+                    <button data-page="about" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface"><svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM9 11h6v1.5H9V11zm0 4h6v1.5H9V15z"/></svg><span>About</span></button>
+                </nav>
 
+                <!-- NAVIGATION -->
+                <nav class="space-y-4 mt-5" id="categoryNav">
+                    
                     <!-- CATEGORIES SECTION HEADER -->
                     <div class="pt-2 border-t border-m3-surfaceVariant">
                         <span class="px-3 text-[11px] font-bold tracking-widest text-gray-500 uppercase font-mono">Categories</span>
@@ -362,6 +400,8 @@
                                 </svg>
                                 <span>Codename Engine</span>
                             </button>
+
+
                         </div>
                     </div>
                 </nav>
@@ -396,29 +436,93 @@
         </aside>
 
         <!-- MAIN DISPLAY CONTAINER -->
-        <main class="flex-1 overflow-y-auto flex flex-col justify-between p-3 sm:p-5 md:p-6 lg:p-8">
-            <div id="mainViewContainer" class="w-full max-w-[1600px] mx-auto">
-                <!-- MOD CARDS GRID -->
-                <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Dynamic mod cards inserted via JS -->
-                </div>
-
-                <!-- EMPTY STATE -->
-                <div id="emptyState" class="hidden flex flex-col items-center justify-center py-24 text-center">
-                    <div class="w-16 h-16 bg-m3-surface border border-m3-border rounded-2xl flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 fill-current text-gray-500" viewBox="0 0 24 24">
-                            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
-                        </svg>
+        <main class="flex-1 overflow-y-auto min-w-0">
+            <div id="mainViewContainer" class="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-7">
+                <!-- HOME / MOD SHOWCASE -->
+                <section id="pageHome" class="pv-page" data-page="home">
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                        <div>
+                            <div class="text-[11px] uppercase tracking-[.2em] text-gray-500 font-mono">PandaVault • Showcase </div>
+                            <h2 class="text-2xl sm:text-3xl font-display font-extrabold mt-1">Friday Night Funkin' Mods</h2>
+                            <p class="text-sm text-gray-500 mt-1">Browse mods by engine, creator category, or search.</p>
+                        </div>
                     </div>
-                    <h3 class="text-base font-bold text-white mb-1">No Mods Showcase Found</h3>
-                    <p class="text-xs text-gray-500 max-w-sm">Use Creator Terminal to add your Friday Night Funkin' mods.</p>
-                </div>
-            </div>
+                    <div id="modGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5"></div>
+                    <div id="emptyState" class="hidden flex flex-col items-center justify-center py-24 text-center">
+                        <div class="w-16 h-16 bg-m3-surface border border-m3-border rounded-2xl flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 fill-current text-gray-500" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">No Mods Showcase Found</h3>
+                        <p class="text-xs text-gray-500 max-w-sm">Use Creator Terminal to add your Friday Night Funkin\' mods.</p>
+                    </div>
+                </section>
 
-            <!-- PAGE FOOTER -->
-            <footer class="mt-16 pt-6 border-t border-m3-surfaceVariant/50 text-center">
-                <p class="text-[11px] tracking-widest text-white/40 uppercase font-medium font-sans">Created By PandaSprite</p>
-            </footer>
+                <!-- UTILITY PAGE -->
+                <section id="pageUtility" class="pv-page hidden" data-page="utility">
+                    <div class="mb-6"><span class="text-[11px] uppercase tracking-[.2em] text-gray-500 font-mono">Utility </span><h2 class="text-2xl sm:text-3xl font-display font-extrabold mt-1">Utility Mods</h2><p class="text-sm text-gray-500 mt-1">A dedicated category for tools, helpers, patches, and useful FNF utilities.</p></div>
+                    <div id="utilityGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5"></div>
+                    <div id="utilityEmpty" class="hidden pv-panel p-8 text-center"><div class="text-3xl mb-2"></div><h3 class="font-bold">No utility mods yet</h3><p class="text-sm text-gray-500 mt-1">Add a mod with the Utility category from Creator Terminal.</p></div>
+                </section>
+
+                <!-- CONVERTER PAGE -->
+                <section id="pageConverter" class="pv-page hidden" data-page="converter">
+                    <div class="mb-6"><span class="text-[11px] uppercase tracking-[.2em] text-gray-500 font-mono">Converter </span><h2 class="text-2xl sm:text-3xl font-display font-extrabold mt-1">Quick Converter</h2><p class="text-sm text-gray-500 mt-1">Fast everyday conversions without leaving PandaVault.</p></div>
+                    <div class="pv-panel max-w-3xl p-6 sm:p-8 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 pointer-events-none opacity-30" style="background-image:repeating-linear-gradient(0deg,transparent,transparent 7px,rgba(255,255,255,.025) 8px)"></div>
+                        <div class="relative">
+                            <div class="font-mono text-xs tracking-[.35em] uppercase text-gray-500">PANDAVAULT CONVERTER</div>
+                            <h3 class="mt-4 text-3xl sm:text-5xl font-display font-black uppercase tracking-tight">WORK IN PROGRESS</h3>
+                            <p class="mt-3 text-sm sm:text-base text-gray-400 max-w-xl mx-auto">This converter is still getting its chart-topping notes lined up. Give it a beat. The full utility is coming soon.</p>
+                            <div class="mt-7 inline-flex items-center gap-2 rounded-xl border border-m3-border bg-m3-container px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-gray-300">
+                                <span class="inline-block w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                                Loading the next track...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SETTINGS PAGE -->
+                <section id="pageSettings" class="pv-page hidden" data-page="settings">
+                    <div class="mb-6"><span class="text-[11px] uppercase tracking-[.2em] text-gray-500 font-mono">Settings </span><h2 class="text-2xl sm:text-3xl font-display font-extrabold mt-1">Settings</h2><p class="text-sm text-gray-500 mt-1">Personalize the PandaVault experience.</p></div>
+                    <div class="grid grid-cols-1 gap-5 max-w-2xl">
+                        <div class="pv-panel p-5"><h3 class="font-bold">Interface</h3>
+                            <div class="mt-4 flex items-center justify-between gap-4"><div><p class="text-sm font-medium">Theme</p><p id="themeModeLabel" class="text-xs text-gray-500 mt-1">Dark mode</p></div><button id="themeToggle" type="button" role="switch" aria-checked="false" class="w-12 h-7 rounded-full bg-m3-container border border-m3-border relative transition"><span class="theme-toggle-knob absolute left-1 top-1 w-5 h-5 rounded-full bg-white transition"></span></button></div>
+                            <div class="mt-5 pt-4 border-t border-m3-border"><div class="flex items-center justify-between gap-4"><div><p class="text-sm font-medium">UI sounds</p><p id="soundModeLabel" class="text-xs text-gray-500 mt-1">Enabled</p></div><button id="soundToggle" type="button" role="switch" aria-checked="true" class="w-12 h-7 rounded-full bg-m3-container border border-m3-border relative transition"><span class="sound-toggle-knob absolute left-1 top-1 w-5 h-5 rounded-full bg-white transition"></span></button></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ABOUT PAGE -->
+                <section id="pageAbout" class="pv-page hidden" data-page="about">
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"><div><span class="text-[11px] uppercase tracking-[.2em] text-gray-500 font-mono">About </span><h2 class="text-2xl sm:text-3xl font-display font-extrabold mt-1">About PandaVault</h2><p class="text-sm text-gray-500 mt-1">A small home for the mods, tools, and projects worth keeping.</p></div><div id="aboutAdminTools" class="hidden"><div class="flex flex-wrap gap-2"><button id="addAboutCardBtn" class="px-4 py-2.5 rounded-xl bg-m3-container border border-m3-border font-bold text-sm hover:bg-m3-surface">Add Card</button><button id="editAboutBtn" class="px-4 py-2.5 rounded-xl bg-white text-black font-bold text-sm hover:bg-gray-200">Edit About</button></div></div></div>
+                    <article id="aboutContent" class="pv-panel p-5 sm:p-8 max-w-4xl pv-rich-content"></article>
+                    <div id="aboutCards" class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+                    <div id="aboutCardEditor" class="hidden mt-5 pv-panel p-4 sm:p-6">
+                        <div class="flex items-center justify-between mb-3"><h3 id="aboutCardEditorTitle" class="font-bold">Add About Card</h3><button id="cancelAboutCardBtn" class="px-3 py-2 rounded-xl bg-m3-container border border-m3-border text-sm">Cancel</button></div>
+                        <input id="aboutCardTitleInput" type="text" maxlength="120" placeholder="Card title" class="w-full bg-black border border-m3-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                        <div class="flex flex-wrap gap-1.5 py-3 border-b border-m3-border">
+                            <button type="button" data-card-cmd="bold" class="rich-btn"><b>B</b></button><button type="button" data-card-cmd="italic" class="rich-btn"><i>I</i></button><button type="button" data-card-cmd="underline" class="rich-btn"><u>U</u></button><button type="button" data-card-cmd="strikeThrough" class="rich-btn"><s>S</s></button>
+                            <button type="button" data-card-block="h1" class="rich-btn">Title</button><button type="button" data-card-block="h2" class="rich-btn">Heading</button><button type="button" data-card-block="h3" class="rich-btn">Small heading</button><button type="button" data-card-block="p" class="rich-btn">Text</button>
+                            <button type="button" data-card-cmd="justifyLeft" class="rich-btn">Left</button><button type="button" data-card-cmd="justifyCenter" class="rich-btn">Center</button><button type="button" data-card-cmd="insertUnorderedList" class="rich-btn">List</button><button type="button" data-card-cmd="insertOrderedList" class="rich-btn">1. List</button><button type="button" data-card-cmd="createLink" class="rich-btn">Link</button><button type="button" data-card-cmd="removeFormat" class="rich-btn">Clear</button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 py-3"><button type="button" data-card-size="1" class="rich-btn">Small</button><button type="button" data-card-size="3" class="rich-btn">Normal</button><button type="button" data-card-size="5" class="rich-btn">Big</button><button type="button" data-card-size="7" class="rich-btn">Huge</button></div>
+                        <div id="aboutCardEditorSurface" contenteditable="true" spellcheck="true" class="pv-editor-surface"></div>
+                        <div class="flex justify-end gap-2 mt-4"><button id="cancelAboutCardBtn2" class="px-4 py-2.5 rounded-xl bg-m3-container border border-m3-border text-sm">Cancel</button><button id="saveAboutCardBtn" class="px-4 py-2.5 rounded-xl bg-white text-black font-bold text-sm">Save Card</button></div>
+                    </div>
+                    <div id="aboutEditor" class="hidden mt-5 pv-panel p-4 sm:p-6">
+                        <div class="flex flex-wrap gap-1.5 pb-3 border-b border-m3-border">
+                            <button type="button" data-cmd="bold" class="rich-btn"><b>B</b></button><button type="button" data-cmd="italic" class="rich-btn"><i>I</i></button><button type="button" data-cmd="underline" class="rich-btn"><u>U</u></button><button type="button" data-cmd="strikeThrough" class="rich-btn"><s>S</s></button>
+                            <button type="button" data-block="h1" class="rich-btn">Title</button><button type="button" data-block="h2" class="rich-btn">Heading</button><button type="button" data-block="h3" class="rich-btn">Small heading</button><button type="button" data-block="p" class="rich-btn">Text</button>
+                            <button type="button" data-cmd="justifyLeft" class="rich-btn">Left</button><button type="button" data-cmd="justifyCenter" class="rich-btn">Center</button><button type="button" data-cmd="insertUnorderedList" class="rich-btn">• List</button><button type="button" data-cmd="insertOrderedList" class="rich-btn">1. List</button>
+                            <button type="button" data-cmd="createLink" class="rich-btn">Link</button><button type="button" data-cmd="removeFormat" class="rich-btn">Clear</button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 py-3"><button type="button" data-size="1" class="rich-btn">Small</button><button type="button" data-size="3" class="rich-btn">Normal</button><button type="button" data-size="5" class="rich-btn">Big</button><button type="button" data-size="7" class="rich-btn">Huge</button></div>
+                        <div id="aboutEditorSurface" contenteditable="true" spellcheck="true" class="pv-editor-surface"></div>
+                        <div class="flex flex-wrap justify-end gap-2 mt-4"><button id="cancelAboutEditBtn" class="px-4 py-2.5 rounded-xl bg-m3-container border border-m3-border text-sm">Cancel</button><button id="saveAboutBtn" class="px-4 py-2.5 rounded-xl bg-white text-black font-bold text-sm">Save About</button></div>
+                    </div>
+                </section>
+            </div>
+            <footer class="px-4 sm:px-6 lg:px-8 py-6 border-t border-m3-surfaceVariant/50 text-center mt-10"><p class="text-[11px] tracking-widest text-white/40 uppercase font-medium font-sans">Created By PandaSprite</p></footer>
         </main>
     </div>
 
@@ -485,6 +589,7 @@
                         <option value="Psych Engine">Psych Engine</option>
                         <option value="P-Slice">P-Slice</option>
                         <option value="Codename Engine">Codename Engine</option>
+                        <option value="Utility">Utility</option>
                     </select>
                 </div>
 
@@ -597,10 +702,14 @@
             </div>
 
             <p class="text-xs text-gray-400 leading-relaxed font-sans">
-                To sync your mods across all visitors on Vercel, download <code class="text-white bg-m3-container px-1 py-0.5 rounded">mods.json</code> below and place it in the root directory of your GitHub repository next to <code class="text-white bg-m3-container px-1 py-0.5 rounded">index.html</code>.
+                To sync your mods and About content across all visitors on Vercel, download the JSON files below and place them in the root directory of your GitHub repository next to <code class="text-white bg-m3-container px-1 py-0.5 rounded">index.html</code>.
             </p>
 
             <div class="space-y-3 pt-2 font-mono">
+                <button id="downloadAboutJsonBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-m3-surface border border-m3-border text-white font-bold rounded-xl hover:bg-m3-container transition text-xs font-sans">
+                    <span>DOWNLOAD ABOUT.JSON</span>
+                </button>
+
                 <button id="downloadJsonBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition text-xs font-sans">
                     <svg class="w-4 h-4 fill-current text-black" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                     <span>DOWNLOAD MODS.JSON</span>
@@ -628,579 +737,283 @@
         let modsData = [];
         let currentCategory = 'ALL';
         let searchQuery = '';
-        let isAdmin = false;
+        let currentPage = 'home';
+        const ABOUT_KEY = 'pandavault_about_html';
+        const ABOUT_CARDS_KEY = 'pandavault_about_cards';
+        const DEFAULT_ABOUT = "<h1>Welcome to PandaVault</h1><p>PandaVault is a community-style showcase for Friday Night Funkin' mods, utilities, and projects.</p><h2>What's here</h2><p>Browse engine categories, explore Utility tools, use the Converter, and customize your experience from Settings.</p><p><b>Creator access</b> unlocks the tools used to manage the vault.</p>";
+        const DEFAULT_ABOUT_CARDS = [];
         const DEFAULT_PASSCODE = 'admin123';
+        let isAdmin = sessionStorage.getItem('panda_vault_admin') === '1';
+        let uiSoundsEnabled = localStorage.getItem('pandavault_ui_sounds') !== '0';
+        let audioContext = null;
 
-        // Color wheel state and helpers.
-        let pvColorHue = 0;
-        let pvColorSaturation = 1;
-        let pvColorValue = 1;
-        function pvHsvToHex(h, s, v) {
-            const f = (n, k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
-            return '#' + [f(5), f(3), f(1)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
-        }
-        function pvHexToHsv(hex) {
-            const n = parseInt(hex.replace('#',''), 16);
-            let r=((n>>16)&255)/255,g=((n>>8)&255)/255,b=(n&255)/255;
-            const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
-            let h=0; if(d){ if(max===r) h=60*((g-b)/d%6); else if(max===g) h=60*((b-r)/d+2); else h=60*((r-g)/d+4); }
-            if(h<0) h+=360; const s=max===0?0:d/max; return [h,s,max];
-        }
-        function pvSetColor(hex, updateWheel=true) {
-            if(!/^#[0-9a-f]{6}$/i.test(hex)) return;
-            hex=hex.toUpperCase();
-            const color=document.getElementById('modColor'); const text=document.getElementById('modColorHex');
-            const label=document.getElementById('modColorHexLabel'); const preview=document.getElementById('modColorPreview');
-            if(color) color.value=hex; if(text && text.value!==hex) text.value=hex; if(label) label.textContent=hex; if(preview) preview.style.background=hex;
-            if(updateWheel){ [pvColorHue,pvColorSaturation,pvColorValue]=pvHexToHsv(hex); pvUpdateWheelCursor(); }
-        }
-        function pvUpdateWheelCursor(){
-            const wheel=document.getElementById('modColorWheel'), cursor=wheel?.querySelector('.pv-color-wheel-cursor'); if(!wheel||!cursor) return;
-            const angle=(pvColorHue-90)*Math.PI/180;
-            cursor.style.left=(50+(Math.cos(angle)*pvColorSaturation)*50)+'%'; cursor.style.top=(50+(Math.sin(angle)*pvColorSaturation)*50)+'%';
-        }
-        function pvPickWheel(e){
-            const wheel=document.getElementById('modColorWheel'); if(!wheel) return; const rect=wheel.getBoundingClientRect();
-            const x=e.clientX-rect.left-rect.width/2, y=e.clientY-rect.top-rect.height/2; const radius=Math.min(rect.width,rect.height)/2;
-            const dist=Math.min(Math.hypot(x,y),radius); pvColorSaturation=dist/radius; pvColorHue=(Math.atan2(y,x)*180/Math.PI+90+360)%360;
-            pvSetColor(pvHsvToHex(pvColorHue,pvColorSaturation,pvColorValue),false); pvUpdateWheelCursor();
-            const wheelEl=document.getElementById('modColorWheel'); if(wheelEl) wheelEl.setAttribute('aria-valuetext',pvHsvToHex(pvColorHue,pvColorSaturation,pvColorValue));
-        }
-
-        // Native Web Audio feedback. Keep the sound path synchronous after the audio context is unlocked.
-        let pvAudioContext = null;
-        let pvAudioReady = false;
         function pvGetAudio() {
-            if (!pvAudioContext) {
-                const Ctx = window.AudioContext || window.webkitAudioContext;
-                if (!Ctx) return null;
-                pvAudioContext = new Ctx({ latencyHint: 'interactive' });
-            }
-            return pvAudioContext;
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)({latencyHint:'interactive'});
+            if (audioContext.state === 'suspended') audioContext.resume();
+            return audioContext;
         }
-        function pvUnlockAudio() {
-            const ctx = pvGetAudio();
-            if (!ctx) return Promise.resolve(null);
-            if (ctx.state === 'running') { pvAudioReady = true; return Promise.resolve(ctx); }
-            return ctx.resume().then(() => { pvAudioReady = ctx.state === 'running'; return ctx; }).catch(() => null);
-        }
-        function pvTone(type = 'click') {
-            const ctx = pvGetAudio();
-            if (!ctx || ctx.state !== 'running') return;
-            const now = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.type = type === 'error' ? 'triangle' : 'sine';
-            const settings = {
-                click: [620, 0.055, 0.20],
-                success: [660, 0.16, 0.30],
-                error: [170, 0.15, 0.25]
-            }[type] || [520, 0.045, 0.025];
-            osc.frequency.setValueAtTime(settings[0], now);
-            if (type === 'success') osc.frequency.exponentialRampToValueAtTime(880, now + settings[1]);
-            if (type === 'error') osc.frequency.exponentialRampToValueAtTime(95, now + settings[1]);
-            gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(settings[2], now + 0.002);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + settings[1]);
-            osc.start(now); osc.stop(now + settings[1] + 0.008);
-
-            if (type !== 'error') {
-                const hi = ctx.createOscillator();
-                const hiGain = ctx.createGain();
-                hi.type = 'triangle';
-                hi.frequency.setValueAtTime(settings[0] * 2, now);
-                hiGain.gain.setValueAtTime(0.0001, now);
-                hiGain.gain.exponentialRampToValueAtTime(settings[2] * 0.20, now + 0.002);
-                hiGain.gain.exponentialRampToValueAtTime(0.0001, now + settings[1]);
-                hi.connect(hiGain); hiGain.connect(ctx.destination);
-                hi.start(now); hi.stop(now + settings[1] + 0.008);
-            }
-        }
-        function pvPlaySuccess() {
-            pvTone('success');
-            window.setTimeout(() => pvTone('success'), 70);
-        }
-        function pvPlayError() { pvTone('error'); }
-
-        // Small visual press feedback without changing existing dimensions.
-        document.addEventListener('pointerdown', (e) => {
-            const button = e.target.closest('button');
-            if (button && !button.disabled) {
-                button.animate([
-                    { transform: 'scale(1)' },
-                    { transform: 'scale(.975)' },
-                    { transform: 'scale(1)' }
-                ], { duration: 145, easing: 'cubic-bezier(.16,1,.3,1)' });
-                // Unlock once on the user's first real interaction, then play directly on every press.
-                if (!pvAudioReady) {
-                    pvUnlockAudio().then(() => pvTone('click'));
-                } else {
-                    pvTone('click');
-                }
-            }
-        }, { passive: true });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const wheel=document.getElementById('modColorWheel'), color=document.getElementById('modColor'), text=document.getElementById('modColorHex');
-            if(!wheel) return;
-            wheel.addEventListener('pointerdown', e => { wheel.setPointerCapture?.(e.pointerId); pvPickWheel(e); });
-            wheel.addEventListener('pointermove', e => { if(e.buttons) pvPickWheel(e); });
-            color?.addEventListener('input', e => pvSetColor(e.target.value));
-            text?.addEventListener('change', e => { let v=e.target.value.trim(); if(!v.startsWith('#')) v='#'+v; if(/^#[0-9a-f]{6}$/i.test(v)) pvSetColor(v); else pvSetColor('#FFFFFF'); });
-            pvSetColor(color?.value || '#FFFFFF');
-        });
-
-        function pvAnimateModal(modal, show) {
-            if (!modal) return;
-            if (show) {
-                modal.classList.remove('hidden', 'pv-modal-closed');
-                modal.classList.add('flex', 'pv-modal-open');
-                modal.setAttribute('aria-hidden', 'false');
-            } else {
-                modal.classList.remove('pv-modal-open');
-                modal.classList.add('pv-modal-closed');
-                modal.setAttribute('aria-hidden', 'true');
-                window.setTimeout(() => {
-                    if (!modal.classList.contains('pv-modal-open')) {
-                        modal.classList.add('hidden');
-                        modal.classList.remove('flex');
-                    }
-                }, 210);
-            }
-        }
-
-        function showAuthComplete() {
-            const modal = document.getElementById('authCompleteModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            requestAnimationFrame(() => modal.classList.add('pv-show'));
-            modal.setAttribute('aria-hidden', 'false');
-            pvPlaySuccess();
-        }
-        function closeAuthComplete() {
-            const modal = document.getElementById('authCompleteModal');
-            modal.classList.remove('pv-show');
-            modal.setAttribute('aria-hidden', 'true');
-            window.setTimeout(() => { if (!modal.classList.contains('pv-show')) { modal.classList.add('hidden'); modal.classList.remove('flex'); } }, 230);
-        }
-
-        // Extract YouTube Video ID from standard YouTube URL
-        function getYouTubeId(url) {
-            if (!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        // Markdown Formatter Helper
-        function parseMarkdown(text) {
-            if (!text) return '';
-            let html = text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-            
-            html = html
-                .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
-                .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>')
-                .replace(/&lt;u&gt;/g, '<u>').replace(/&lt;\/u&gt;/g, '</u>')
-                .replace(/&lt;s&gt;/g, '<s>').replace(/&lt;\/s&gt;/g, '</s>');
-
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
-            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
-            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-
-            return html.replace(/\n/g, '<br>');
-        }
-
-        function insertMarkdown(startTag, endTag) {
-            const textarea = document.getElementById('modDescription');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const selectedText = textarea.value.substring(start, end) || 'text';
-            const replacement = startTag + selectedText + endTag;
-            textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
-            textarea.focus();
-        }
-
-        // Color Sync in Modal Inputs
-        const modColorPicker = document.getElementById('modColor');
-        const modColorHex = document.getElementById('modColorHex');
-
-        modColorPicker.addEventListener('input', (e) => modColorHex.value = e.target.value.toUpperCase());
-        modColorHex.addEventListener('input', (e) => {
-            if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-                modColorPicker.value = e.target.value;
-            }
-        });
-
-        // Initialize Application Data
-        async function initApp() {
-            if (sessionStorage.getItem('panda_vault_admin') === 'true') {
-                enableAdminMode();
-            }
-
-            // 1. Try fetching mods.json from server (Vercel deployment)
+        function pvTone(type='click') {
+            if (!uiSoundsEnabled) return;
             try {
-                const response = await fetch('./mods.json');
-                if (response.ok) {
-                    const serverMods = await response.json();
-                    if (Array.isArray(serverMods) && serverMods.length > 0) {
-                        modsData = serverMods;
-                        saveToLocal();
-                        renderMods();
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.log('No server mods.json detected.');
-            }
-
-            // 2. Fallback to LocalStorage
-            const stored = localStorage.getItem('pandavault_mods');
-            if (stored) {
-                try {
-                    modsData = JSON.parse(stored);
-                } catch(e) {
-                    modsData = [];
-                }
-            } else {
-                modsData = [];
-            }
-
-            renderMods();
+                const ac = pvGetAudio();
+                const now = ac.currentTime;
+                const osc = ac.createOscillator();
+                const gain = ac.createGain();
+                osc.type = type === 'error' ? 'square' : 'sine';
+                osc.frequency.setValueAtTime(type === 'success' ? 620 : type === 'error' ? 180 : 520, now);
+                if (type === 'success') osc.frequency.exponentialRampToValueAtTime(900, now + .055);
+                if (type === 'error') osc.frequency.exponentialRampToValueAtTime(95, now + .09);
+                gain.gain.setValueAtTime(type === 'click' ? .22 : .34, now);
+                gain.gain.exponentialRampToValueAtTime(.001, now + (type === 'click' ? .045 : .13));
+                osc.connect(gain); gain.connect(ac.destination); osc.start(now); osc.stop(now + .14);
+            } catch(e) {}
         }
-
-        function saveToLocal() {
-            localStorage.setItem('pandavault_mods', JSON.stringify(modsData));
+        function setAdminState(value) {
+            isAdmin = !!value;
+            sessionStorage.setItem('panda_vault_admin', isAdmin ? '1' : '0');
+            document.getElementById('adminSidebarSection')?.classList.toggle('hidden', !isAdmin);
+            const label = document.getElementById('accessStatusLabel');
+            const dot = document.getElementById('accessStatusDot');
+            if (label) label.textContent = isAdmin ? '[>] CREATOR ACCESS ACTIVE' : '[>] CREATOR TERMINAL';
+            if (dot) dot.className = 'w-2 h-2 rounded-full ' + (isAdmin ? 'bg-white' : 'bg-gray-600');
+            updateAboutAdmin();
         }
-
-        // Smooth page traversal wrapper. Rendering itself remains unchanged.
-        let pvRenderTimer = null;
-        function pvRenderMods() {
-            const view = document.getElementById('mainViewContainer');
-            if (!view) return renderMods();
-            if (pvRenderTimer) clearTimeout(pvRenderTimer);
-            view.classList.remove('pv-view-fade-in');
-            view.classList.add('pv-view-fade-out');
-            pvRenderTimer = setTimeout(() => {
-                renderMods();
-                view.classList.remove('pv-view-fade-out');
-                view.classList.add('pv-view-fade-in');
-            }, 85);
-        }
-
-        // Render Cards Grid
-        function renderMods() {
-            const grid = document.getElementById('modGrid');
-            const emptyState = document.getElementById('emptyState');
-            const mainViewContainer = document.getElementById('mainViewContainer');
-
-            // Filter logic
-            const filtered = modsData.filter(mod => {
-                const matchesCat = (currentCategory === 'ALL') || (mod.category === currentCategory);
-                const matchesSearch = mod.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                      (mod.description && mod.description.toLowerCase().includes(searchQuery.toLowerCase()));
-                return matchesCat && matchesSearch;
-            });
-
-            grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-
-            filtered.forEach(mod => {
-                const card = document.createElement('div');
-                const customColor = mod.color || '#FFFFFF';
-                const youtubeId = getYouTubeId(mod.youtubeUrl);
-                const hoverGif = mod.hoverGif || '';
-
-                card.className = "mod-card bg-m3-surface border border-m3-border rounded-[20px] overflow-hidden flex flex-col justify-between relative group font-sans";
-                card.style.borderColor = "rgba(255,255,255,0.1)";
-                card.style.setProperty("--pv-color", customColor);
-
-                // Custom dynamic hover color logic
-                card.onmouseenter = () => card.style.borderColor = customColor;
-                card.onmouseleave = () => card.style.borderColor = "rgba(255,255,255,0.1)";
-
-                // Build Media Hover Container (GIF vs YouTube Preview)
-                let mediaHoverHTML = '';
-                if (hoverGif) {
-                    // Custom GIF Hover Mode
-                    mediaHoverHTML = `
-                        <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:opacity-0 transition duration-300 absolute inset-0 z-10" loading="lazy">
-                        <img src="${hoverGif}" alt="${mod.title} Hover" class="w-full h-full object-cover absolute inset-0 z-0 opacity-100" loading="lazy">
-                    `;
-                } else if (youtubeId) {
-                    // YouTube Preview Embed Hover Mode
-                    mediaHoverHTML = `
-                        <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:opacity-0 transition duration-300 absolute inset-0 z-10" loading="lazy">
-                        <iframe class="w-full h-full absolute inset-0 z-0 pointer-events-none scale-125" src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1" title="YouTube preview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-                    `;
-                } else {
-                    // Fallback Static Image
-                    mediaHoverHTML = `
-                        <img src="${mod.image}" alt="${mod.title}" class="w-full h-full object-cover group-hover/img:scale-105 transition duration-500" loading="lazy">
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div>
-                        <!-- Thumbnail Clickable Image (Redirects to YouTube) -->
-                        <a href="${mod.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="block relative aspect-video bg-m3-container overflow-hidden group/img">
-                            ${mediaHoverHTML}
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition duration-300 flex items-center justify-center z-20">
-                                <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-xl transform scale-90 group-hover/img:scale-100 transition duration-300">
-                                    <svg class="w-6 h-6 fill-current text-black ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
-                            </div>
-                        </a>
-
-                        <!-- Card Body -->
-                        <div class="p-5">
-                            <h3 class="pv-custom-title font-display font-bold text-base mb-2 leading-snug">${escapeHtml(mod.title)}</h3>
-                            <div class="pv-custom-description text-xs leading-relaxed markdown-content max-h-28 overflow-y-auto pr-1 font-sans">
-                                ${parseMarkdown(mod.description || '')}
-                            </div>
-                            <!-- Category Badge (Positioned below description area) -->
-                            <div class="mt-4">
-                                <span class="pv-category inline-block text-xs font-semibold tracking-wide px-3 py-1 rounded-full border transition-colors" style="background-color: #000000;">
-                                    ${mod.category}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer Actions -->
-                    <div class="px-5 pb-5 pt-2 flex items-center justify-between border-t border-m3-surfaceVariant/50 mt-2">
-                        <!-- Direct Download Button -->
-                        <a href="${mod.downloadUrl}" target="_blank" rel="noopener noreferrer" class="pv-download flex-1 flex items-center justify-center space-x-2 font-bold text-xs py-2.5 px-4 rounded-xl transition active:scale-98 shadow-md" style="color: ${getContrastYIQ(customColor)};">
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                            <span>DOWNLOAD</span>
-                        </a>
-
-                        <!-- Creator Controls -->
-                        ${isAdmin ? `
-                            <div class="flex items-center space-x-1 ml-2">
-                                <button onclick="editMod('${mod.id}')" class="p-2 text-gray-400 hover:text-white bg-m3-surface hover:bg-m3-container rounded-xl border border-m3-border transition" title="Edit Mod">
-                                    <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                                </button>
-                                <button onclick="deleteMod('${mod.id}')" class="p-2 text-gray-400 hover:text-white bg-m3-surface hover:bg-m3-container rounded-xl border border-m3-border transition" title="Delete Mod">
-                                    <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                </button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        // Helper to contrast dark vs light text color over custom card button color
-        function getContrastYIQ(hexcolor){
-            hexcolor = hexcolor.replace("#", "");
-            if (hexcolor.length === 3) {
-                hexcolor = hexcolor.split('').map(c => c + c).join('');
-            }
-            const r = parseInt(hexcolor.substr(0,2),16);
-            const g = parseInt(hexcolor.substr(2,2),16);
-            const b = parseInt(hexcolor.substr(4,2),16);
-            const yiq = ((r*299)+(g*587)+(b*114))/1000;
-            return (yiq >= 128) ? '#000000' : '#FFFFFF';
-        }
-
-        function escapeHtml(str) {
-            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-        }
-
-        // NAVIGATION & DRAWER LOGIC
-        const sidebarDrawer = document.getElementById('sidebarDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-
-        function toggleDrawer() {
-            sidebarDrawer.classList.toggle('-translate-x-full');
-            drawerOverlay.classList.toggle('hidden');
-        }
-
-        document.getElementById('toggleDrawerBtn').addEventListener('click', toggleDrawer);
-        drawerOverlay.addEventListener('click', toggleDrawer);
-
-        // Category Navigation Buttons
-        document.querySelectorAll('#categoryNav .nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('#categoryNav .nav-btn').forEach(b => {
-                    b.classList.remove('active', 'bg-m3-container', 'text-white', 'border', 'border-m3-border', 'font-semibold');
-                    b.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-m3-surface', 'font-medium');
-                });
-
-                btn.classList.add('active', 'bg-m3-container', 'text-white', 'border', 'border-m3-border', 'font-semibold');
-                btn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-m3-surface', 'font-medium');
-
-                currentCategory = btn.getAttribute('data-category');
-                pvRenderMods();
-
-                if (window.innerWidth < 768) toggleDrawer();
-            });
-        });
-
-        // Search Input
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchQuery = e.target.value.trim();
-            pvRenderMods();
-        });
-
-        // CREATOR TERMINAL ACCESS
-        function enableAdminMode() {
-            isAdmin = true;
-            sessionStorage.setItem('panda_vault_admin', 'true');
-            document.getElementById('adminSidebarSection').classList.remove('hidden');
-            document.getElementById('accessStatusDot').className = 'w-2 h-2 rounded-full bg-white animate-pulse';
-            document.getElementById('accessStatusLabel').textContent = '[>] CREATOR UNLOCKED';
-            document.getElementById('accessStatusLabel').className = 'text-white font-bold';
-            renderMods();
-        }
-
-        document.getElementById('desktopCreatorTerminalBtn').addEventListener('click', () => {
-            pvAnimateModal(document.getElementById('passcodeModal'), true);
-            setTimeout(() => document.getElementById('passcodeInput')?.focus(), 120);
-        });
-
-        document.getElementById('openPasscodeModalBtn').addEventListener('click', () => {
-            if (isAdmin) {
-                if (confirm('Lock Creator Access Terminal?')) {
-                    isAdmin = false;
-                    sessionStorage.removeItem('panda_vault_admin');
-                    document.getElementById('adminSidebarSection').classList.add('hidden');
-                    document.getElementById('accessStatusDot').className = 'w-2 h-2 rounded-full bg-gray-600';
-                    document.getElementById('accessStatusLabel').textContent = '[>] CREATOR TERMINAL';
-                    document.getElementById('accessStatusLabel').className = 'text-gray-400';
-                    renderMods();
-                }
-            } else {
-                pvAnimateModal(document.getElementById('passcodeModal'), true);
-                document.getElementById('passcodeInput').focus();
-            }
-        });
-
-        function closeTerminalModal() {
-            pvAnimateModal(document.getElementById('passcodeModal'), false);
-            document.getElementById('passcodeError').classList.add('hidden');
-            document.getElementById('passcodeInput').value = '';
-        }
-
-        document.getElementById('closePasscodeModalBtn').addEventListener('click', closeTerminalModal);
-        document.getElementById('cancelPasscodeBtn').addEventListener('click', closeTerminalModal);
-
-        document.getElementById('passcodeForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const val = document.getElementById('passcodeInput').value;
-            if (val === DEFAULT_PASSCODE) {
-                closeTerminalModal();
-                enableAdminMode();
-                showAuthComplete();
-            } else {
-                document.getElementById('passcodeError').classList.remove('hidden');
-                pvPlayError();
-                const input = document.getElementById('passcodeInput');
-                input.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}], {duration:220});
-                input.focus();
-            }
-        });
-
-        // MOD FORM LOGIC
+        function pvAnimateModal(modal, show) { if (!modal) return; modal.classList.toggle('hidden', !show); if (show) { modal.classList.add('flex'); } else { modal.classList.remove('flex'); } }
+        function closeAuthComplete(){ const m=document.getElementById('authCompleteModal'); if(m){m.classList.add('hidden');m.classList.remove('flex');} }
+        function closeTerminalModal(){ pvAnimateModal(document.getElementById('passcodeModal'), false); }
         const uploadModal = document.getElementById('uploadModal');
-        const modForm = document.getElementById('modForm');
+        const vercelSyncModal = document.getElementById('vercelSyncModal');
+        function saveToLocal(){ localStorage.setItem('pandavault_mods', JSON.stringify(modsData)); }
+        function renderMods() {
+            const q = searchQuery.trim().toLowerCase();
+            const filtered = modsData.filter(m => (currentCategory === 'ALL' || (m.category || '') === currentCategory) && (!q || JSON.stringify(m).toLowerCase().includes(q)));
+            const grid = document.getElementById('modGrid'), empty = document.getElementById('emptyState');
+            if (!grid) return;
+            grid.innerHTML = filtered.map(m => {
+                const color = m.color || '#ffffff';
+                const title = escapeHtml(m.title || 'Untitled Mod');
+                const desc = escapeHtml(m.description || '');
+                const cat = escapeHtml(m.category || 'Utility');
+                const image = m.image || '';
+                return `<article class="mod-card overflow-hidden rounded-2xl border border-m3-border bg-m3-surface" style="--pv-color:${color}"><div class="aspect-video bg-black overflow-hidden">${image ? `<img src="${escapeHtml(image)}" alt="" class="w-full h-full object-cover" loading="lazy" onerror="this.style.display='none'">` : ''}</div><div class="p-4"><div class="pv-category inline-flex px-2 py-1 rounded-lg border text-[10px] font-mono uppercase">${cat}</div><h3 class="pv-custom-title mt-3 text-lg font-bold">${title}</h3><p class="pv-custom-description mt-1 text-sm line-clamp-3">${desc}</p><div class="mt-4 flex gap-2">${m.download ? `<a class="pv-download inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold text-black" href="${escapeHtml(m.download)}" target="_blank" rel="noopener">Download</a>` : ''}${m.youtube ? `<a class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-medium bg-m3-container border border-m3-border" href="${escapeHtml(m.youtube)}" target="_blank" rel="noopener">Preview</a>` : ''}</div></div></article>`;
+            }).join('');
+            empty?.classList.toggle('hidden', filtered.length !== 0);
+            renderUtilityMods();
+        }
+        function renderUtilityMods(){
+            const grid=document.getElementById('utilityGrid'), empty=document.getElementById('utilityEmpty'); if(!grid) return;
+            const q=searchQuery.trim().toLowerCase(); const list=modsData.filter(m=>(m.category||'').toLowerCase()==='utility' && (!q || JSON.stringify(m).toLowerCase().includes(q)));
+            grid.innerHTML=list.map(m=>{const color=m.color||'#fff';return `<article class="mod-card overflow-hidden rounded-2xl border border-m3-border bg-m3-surface" style="--pv-color:${color}"><div class="aspect-video bg-black overflow-hidden">${m.image?`<img src="${escapeHtml(m.image)}" alt="" class="w-full h-full object-cover" loading="lazy">`:''}</div><div class="p-4"><div class="pv-category inline-flex px-2 py-1 rounded-lg border text-[10px] font-mono uppercase">Utility</div><h3 class="pv-custom-title mt-3 text-lg font-bold">${escapeHtml(m.title||'Untitled Mod')}</h3><p class="pv-custom-description mt-1 text-sm">${escapeHtml(m.description||'')}</p></div></article>`}).join(''); empty?.classList.toggle('hidden', list.length!==0);
+        }
+        function loadMods(){ try { modsData=JSON.parse(localStorage.getItem('pandavault_mods')||'[]'); } catch(e){modsData=[];} renderMods(); }
 
-        document.getElementById('openUploadModalBtn').addEventListener('click', () => {
-            document.getElementById('modalTitle').textContent = 'Upload New Mod';
-            modForm.reset();
-            document.getElementById('modColor').value = '#FFFFFF';
-            document.getElementById('modColorHex').value = '#FFFFFF';
-            document.getElementById('modId').value = '';
-            pvAnimateModal(uploadModal, true);
+        // Page navigation: keep the existing sidebar UI and only switch the visible view.
+        function showPage(page) {
+            const validPages = ['home','utility','converter','settings','about'];
+            if (!validPages.includes(page)) page = 'home';
+            currentPage = page;
+
+            document.querySelectorAll('.pv-page').forEach(section => {
+                section.classList.toggle('hidden', section.dataset.page !== page);
+            });
+
+            document.querySelectorAll('#pageNav .nav-btn').forEach(btn => {
+                const active = btn.dataset.page === page;
+                btn.classList.toggle('active', active);
+                btn.classList.toggle('text-white', active);
+                btn.classList.toggle('bg-m3-container', active);
+                btn.classList.toggle('border', active);
+                btn.classList.toggle('border-m3-border', active);
+                btn.classList.toggle('font-semibold', active);
+                btn.classList.toggle('text-gray-400', !active);
+            });
+
+            if (page === 'about') {
+                renderAbout();
+                updateAboutAdmin();
+            }
+        }
+
+        // Category navigation: preserve the existing category controls without changing their layout.
+        document.querySelectorAll('#categoryNav [data-category]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentCategory = btn.dataset.category;
+                document.querySelectorAll('#categoryNav [data-category]').forEach(item => item.classList.remove('active'));
+                btn.classList.add('active');
+                if (typeof renderMods === 'function') renderMods();
+                closeSidebarDrawer();
+            });
         });
 
-        document.getElementById('closeUploadModalBtn').addEventListener('click', () => pvAnimateModal(uploadModal, false));
-        document.getElementById('cancelUploadBtn').addEventListener('click', () => pvAnimateModal(uploadModal, false));
+        function getAboutCards(){
+            try { return JSON.parse(localStorage.getItem(ABOUT_CARDS_KEY) || '[]'); } catch(e) { return []; }
+        }
+        function saveAboutCards(cards){ localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(cards)); }
 
-        document.getElementById('modImageFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    document.getElementById('modImage').value = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+        async function loadPublishedAbout(){
+            try {
+                const res=await fetch('about.json', {cache:'no-store'});
+                if(!res.ok) return;
+                const data=await res.json();
+                if(data && typeof data.html==='string' && !localStorage.getItem(ABOUT_KEY)) localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(data.html));
+                if(data && Array.isArray(data.cards) && !localStorage.getItem(ABOUT_CARDS_KEY)) localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(data.cards));
+                renderAbout();
+            } catch(e) {}
+        }
+
+        function getAboutPayload(){
+            return { html: sanitizeAboutHtml(localStorage.getItem(ABOUT_KEY) || DEFAULT_ABOUT), cards: getAboutCards() };
+        }
+        function renderAbout() {
+            const content = localStorage.getItem(ABOUT_KEY) || DEFAULT_ABOUT;
+            const el = document.getElementById('aboutContent');
+            if (el) el.innerHTML = sanitizeAboutHtml(content);
+            renderAboutCards();
+        }
+
+        function sanitizeAboutHtml(html) {
+            const allowed = new Set(['B','STRONG','I','EM','U','S','DEL','H1','H2','H3','P','BR','UL','OL','LI','A','BLOCKQUOTE','DIV','SPAN','FONT']);
+            const doc = new DOMParser().parseFromString(html || '', 'text/html');
+            doc.body.querySelectorAll('*').forEach(node => {
+                if (!allowed.has(node.tagName)) { node.replaceWith(...Array.from(node.childNodes)); return; }
+                [...node.attributes].forEach(attr => {
+                    if (node.tagName === 'A' && attr.name === 'href' && /^(https?:|mailto:)/i.test(attr.value)) { node.setAttribute('target','_blank'); node.setAttribute('rel','noopener noreferrer'); }
+                    else if (node.tagName === 'FONT' && attr.name === 'size' && /^[1-7]$/.test(attr.value)) {}
+                    else if (attr.name !== 'href' && attr.name !== 'target' && attr.name !== 'rel') node.removeAttribute(attr.name);
+                });
+            });
+            return doc.body.innerHTML;
+        }
+
+        function renderAboutCards(){
+            const wrap=document.getElementById('aboutCards'); if(!wrap) return;
+            const cards=getAboutCards();
+            wrap.innerHTML=cards.map((card,index)=>`<article class="pv-panel pv-about-card p-5 sm:p-6">
+                <div class="pv-card-actions absolute top-3 right-3 gap-1.5">
+                    ${isAdmin?`<button type="button" class="rich-btn" data-about-edit="${index}">Edit</button><button type="button" class="rich-btn" data-about-delete="${index}">Delete</button>`:''}
+                </div>
+                <div class="pv-rich-content pr-16"><h2>${escapeHtml(card.title||'Untitled')}</h2>${sanitizeAboutHtml(card.content||'<p>New About card.</p>')}</div>
+            </article>`).join('');
+            wrap.querySelectorAll('[data-about-edit]').forEach(b=>b.addEventListener('click',()=>editAboutCard(Number(b.dataset.aboutEdit))));
+            wrap.querySelectorAll('[data-about-delete]').forEach(b=>b.addEventListener('click',()=>deleteAboutCard(Number(b.dataset.aboutDelete))));
+        }
+        function escapeHtml(v){ const d=document.createElement('div'); d.textContent=v; return d.innerHTML; }
+        let editingAboutCardIndex = -1;
+        function openAboutCardEditor(index=-1){
+            if(!isAdmin) return; editingAboutCardIndex=index;
+            const card=index>=0 ? getAboutCards()[index] : null;
+            document.getElementById('aboutCardEditorTitle').textContent=index>=0?'Edit About Card':'Add About Card';
+            document.getElementById('aboutCardTitleInput').value=card?.title||'';
+            document.getElementById('aboutCardEditorSurface').innerHTML=card?.content||'<p>Write your card content here.</p>';
+            document.getElementById('aboutCardEditor').classList.remove('hidden');
+            document.getElementById('aboutCardEditorSurface').focus();
+        }
+        function closeAboutCardEditor(){ document.getElementById('aboutCardEditor')?.classList.add('hidden'); editingAboutCardIndex=-1; }
+        function addAboutCard(){ openAboutCardEditor(-1); }
+        function editAboutCard(index){ openAboutCardEditor(index); }
+        function saveAboutCard(){
+            if(!isAdmin) return; const title=document.getElementById('aboutCardTitleInput').value.trim()||'Untitled';
+            const content=sanitizeAboutHtml(document.getElementById('aboutCardEditorSurface').innerHTML||'<p></p>');
+            const cards=getAboutCards(); const card={title,content};
+            if(editingAboutCardIndex>=0) cards[editingAboutCardIndex]=card; else cards.push(card);
+            saveAboutCards(cards); closeAboutCardEditor(); renderAboutCards();
+        }
+        function deleteAboutCard(index){ if(!isAdmin) return; const cards=getAboutCards(); if(confirm('Delete this About card?')){cards.splice(index,1);saveAboutCards(cards);renderAboutCards();} }
+
+        function updateAboutAdmin() {
+            const tools = document.getElementById('aboutAdminTools');
+            if (tools) tools.classList.toggle('hidden', !isAdmin);
+            renderAboutCards();
+        }
+
+        function openAboutEditor() {
+            if (!isAdmin) return;
+            document.getElementById('aboutEditorSurface').innerHTML = localStorage.getItem(ABOUT_KEY) || DEFAULT_ABOUT;
+            document.getElementById('aboutEditor').classList.remove('hidden');
+            document.getElementById('aboutEditorSurface').focus();
+        }
+
+        function execRichCommand(cmd, value=null) {
+            document.getElementById('aboutEditorSurface')?.focus();
+            if (cmd === 'createLink') { const url = prompt('Enter URL:'); if (!url) return; value = url; }
+            document.execCommand(cmd, false, value);
+        }
+
+        function closeSidebarDrawer() {
+            const drawer = document.getElementById('sidebarDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            if (drawer) drawer.classList.add('-translate-x-full');
+            if (overlay) overlay.classList.add('hidden');
+        }
+        document.querySelectorAll('#pageNav .nav-btn').forEach(btn => btn.addEventListener('click', () => {
+            showPage(btn.dataset.page);
+            closeSidebarDrawer();
+        }));
+        document.getElementById('editAboutBtn')?.addEventListener('click', openAboutEditor);
+        document.getElementById('addAboutCardBtn')?.addEventListener('click', addAboutCard);
+        document.getElementById('cancelAboutEditBtn')?.addEventListener('click', () => document.getElementById('aboutEditor').classList.add('hidden'));
+        document.getElementById('saveAboutBtn')?.addEventListener('click', () => {
+            const raw = document.getElementById('aboutEditorSurface').innerHTML;
+            localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(raw));
+            document.getElementById('aboutEditor').classList.add('hidden');
+            renderAbout();
         });
+        document.querySelectorAll('[data-cmd]').forEach(btn => btn.addEventListener('click', () => execRichCommand(btn.dataset.cmd)));
+        document.querySelectorAll('[data-card-cmd]').forEach(btn => btn.addEventListener('click', () => { document.getElementById('aboutCardEditorSurface')?.focus(); let value=null; if(btn.dataset.cardCmd==='createLink'){value=prompt('Enter URL:'); if(!value)return;} document.execCommand(btn.dataset.cardCmd,false,value); }));
+        document.querySelectorAll('[data-card-block]').forEach(btn => btn.addEventListener('click', () => { document.getElementById('aboutCardEditorSurface')?.focus(); document.execCommand('formatBlock',false,btn.dataset.cardBlock); }));
+        document.querySelectorAll('[data-card-size]').forEach(btn => btn.addEventListener('click', () => { document.getElementById('aboutCardEditorSurface')?.focus(); document.execCommand('fontSize',false,btn.dataset.cardSize); }));
+        document.getElementById('cancelAboutCardBtn')?.addEventListener('click', closeAboutCardEditor);
+        document.getElementById('cancelAboutCardBtn2')?.addEventListener('click', closeAboutCardEditor);
+        document.getElementById('saveAboutCardBtn')?.addEventListener('click', saveAboutCard);
+        document.querySelectorAll('[data-block]').forEach(btn => btn.addEventListener('click', () => execRichCommand('formatBlock', btn.dataset.block)));
+        document.querySelectorAll('[data-size]').forEach(btn => btn.addEventListener('click', () => execRichCommand('fontSize', btn.dataset.size)));
 
-        modForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = document.getElementById('modId').value || 'mod_' + Date.now();
-            const title = document.getElementById('modTitle').value.trim();
-            const color = document.getElementById('modColorHex').value.trim() || '#ffffff';
-            const category = document.getElementById('modCategory').value;
-            const description = document.getElementById('modDescription').value.trim();
-            const image = document.getElementById('modImage').value.trim();
-            const hoverGif = document.getElementById('modHoverGif').value.trim();
-            const youtubeUrl = document.getElementById('modYoutube').value.trim();
-            const downloadUrl = document.getElementById('modDownload').value.trim();
-
-            const existingIndex = modsData.findIndex(m => m.id === id);
-            const modObj = { id, title, color, category, description, image, hoverGif, youtubeUrl, downloadUrl };
-
-            if (existingIndex >= 0) {
-                modsData[existingIndex] = modObj;
-            } else {
-                modsData.unshift(modObj);
-            }
-
-            saveToLocal();
-            renderMods();
-            pvAnimateModal(uploadModal, false);
+        function convertValue(v, from, to) {
+            if (from === to) return v;
+            const groups = { px:{px:1}, kb:{kb:1,mb:.001}, mb:{mb:1,kb:1024}, sec:{sec:1,min:1/60}, min:{min:1,sec:60} };
+            if (!groups[from] || !groups[from][to]) return null;
+            return v * (groups[to][to] || 1) / (groups[from][from] || 1);
+        }
+        function updateConverter() {
+            const valueEl=document.getElementById('convValue'), fromEl=document.getElementById('convFrom'), toEl=document.getElementById('convTo'), resultEl=document.getElementById('convResult');
+            if (!valueEl || !fromEl || !toEl || !resultEl) return;
+            const v=Number(valueEl.value)||0, from=fromEl.value, to=toEl.value;
+            const r=convertValue(v,from,to); resultEl.textContent = r === null ? 'Choose compatible units' : Number(r.toFixed(6)).toLocaleString();
+        }
+        ['convValue','convFrom','convTo'].forEach(id => document.getElementById(id)?.addEventListener('input', updateConverter));
+        document.getElementById('themeToggle')?.addEventListener('click', () => { const light=!document.body.classList.contains('pv-light'); document.body.classList.toggle('pv-light', light); localStorage.setItem('pandavault_theme', light?'light':'dark'); document.getElementById('themeToggle').setAttribute('aria-checked', String(light)); document.getElementById('themeModeLabel').textContent=light?'Light mode':'Dark mode'; pvTone('click'); });
+        document.getElementById('soundToggle')?.addEventListener('click', () => { uiSoundsEnabled=!uiSoundsEnabled; localStorage.setItem('pandavault_ui_sounds', uiSoundsEnabled?'1':'0'); const b=document.getElementById('soundToggle'); b.setAttribute('aria-checked', String(uiSoundsEnabled)); document.getElementById('soundModeLabel').textContent=uiSoundsEnabled?'Enabled':'Disabled'; if(uiSoundsEnabled) pvTone('click'); });
+        document.getElementById('openPasscodeModalBtn')?.addEventListener('click', () => { if(isAdmin){setAdminState(false);return;} pvAnimateModal(document.getElementById('passcodeModal'),true); document.getElementById('passcodeInput')?.focus(); });
+        document.getElementById('closePasscodeModalBtn')?.addEventListener('click', closeTerminalModal);
+        document.getElementById('cancelPasscodeBtn')?.addEventListener('click', closeTerminalModal);
+        document.getElementById('passcodeForm')?.addEventListener('submit', e => { e.preventDefault(); const input=document.getElementById('passcodeInput'); if(input?.value===DEFAULT_PASSCODE){ setAdminState(true); closeTerminalModal(); pvTone('success'); } else { document.getElementById('passcodeError')?.classList.remove('hidden'); input?.classList.add('border-red-400'); pvTone('error'); } });
+        document.getElementById('searchInput')?.addEventListener('input', e => { searchQuery=e.target.value; renderMods(); });
+        document.getElementById('toggleDrawerBtn')?.addEventListener('click', () => {
+            const drawer = document.getElementById('sidebarDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            const opening = drawer?.classList.contains('-translate-x-full');
+            drawer?.classList.toggle('-translate-x-full');
+            overlay?.classList.toggle('hidden', !opening);
         });
-
-        window.editMod = function(id) {
-            const mod = modsData.find(m => m.id === id);
-            if (!mod) return;
-            document.getElementById('modalTitle').textContent = 'Edit Mod';
-            document.getElementById('modId').value = mod.id;
-            document.getElementById('modTitle').value = mod.title;
-            document.getElementById('modColor').value = mod.color || '#FFFFFF';
-            document.getElementById('modColorHex').value = mod.color || '#FFFFFF';
-            document.getElementById('modCategory').value = mod.category;
-            document.getElementById('modDescription').value = mod.description || '';
-            document.getElementById('modImage').value = mod.image;
-            document.getElementById('modHoverGif').value = mod.hoverGif || '';
-            document.getElementById('modYoutube').value = mod.youtubeUrl;
-            document.getElementById('modDownload').value = mod.downloadUrl;
-            pvAnimateModal(uploadModal, true);
-        };
-
-        window.deleteMod = function(id) {
-            if (confirm('Delete this mod showcase?')) {
-                modsData = modsData.filter(m => m.id !== id);
-                saveToLocal();
-                renderMods();
-            }
-        };
+        document.getElementById('drawerOverlay')?.addEventListener('click', closeSidebarDrawer);
+        document.querySelectorAll('button').forEach(btn => btn.addEventListener('pointerdown', () => pvTone('click')));
+        const savedTheme=localStorage.getItem('pandavault_theme')==='light'; document.body.classList.toggle('pv-light', savedTheme); if(document.getElementById('themeToggle')) document.getElementById('themeToggle').setAttribute('aria-checked',String(savedTheme)); if(document.getElementById('themeModeLabel')) document.getElementById('themeModeLabel').textContent=savedTheme?'Light mode':'Dark mode'; if(document.getElementById('soundToggle')) document.getElementById('soundToggle').setAttribute('aria-checked',String(uiSoundsEnabled)); if(document.getElementById('soundModeLabel')) document.getElementById('soundModeLabel').textContent=uiSoundsEnabled?'Enabled':'Disabled';
+        setAdminState(isAdmin);
+        updateConverter();
+        loadMods();
+        loadPublishedAbout();
 
         // VERCEL / GITHUB SYNC
-        const vercelSyncModal = document.getElementById('vercelSyncModal');
         document.getElementById('openVercelSyncBtn').addEventListener('click', () => {
             document.getElementById('jsonImportArea').value = JSON.stringify(modsData, null, 2);
             pvAnimateModal(vercelSyncModal, true);
         });
         document.getElementById('closeVercelSyncModalBtn').addEventListener('click', () => pvAnimateModal(vercelSyncModal, false));
+
+        document.getElementById('downloadAboutJsonBtn').addEventListener('click', () => {
+            const dataStr = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getAboutPayload(), null, 2));
+            const a=document.createElement('a'); a.href=dataStr; a.download='about.json'; document.body.appendChild(a); a.click(); a.remove();
+        });
 
         document.getElementById('downloadJsonBtn').addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(modsData, null, 2));
@@ -1235,8 +1048,8 @@
             }
         });
 
-        document.getElementById('confirmAuthBtn').addEventListener('click', closeAuthComplete);
-        document.getElementById('authCompleteModal').addEventListener('click', (e) => { if (e.target.id === 'authCompleteModal') closeAuthComplete(); });
+        document.getElementById('confirmAuthBtn')?.addEventListener('click', closeAuthComplete);
+        document.getElementById('authCompleteModal')?.addEventListener('click', (e) => { if (e.target.id === 'authCompleteModal') closeAuthComplete(); });
 
         // Global Keyboard Shortcut: ESC closes modals
         window.addEventListener('keydown', (e) => {
@@ -1249,7 +1062,10 @@
         });
 
         // Initialize App
-        window.addEventListener('DOMContentLoaded', initApp);
+        window.addEventListener('DOMContentLoaded', () => {
+            showPage('home');
+            if (typeof renderAbout === 'function') renderAbout();
+        });
     </script>
 </body>
 </html>
