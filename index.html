@@ -523,11 +523,11 @@
                         <span>UPLOAD MOD</span>
                     </button>
 
-                    <button id="openVercelSyncBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-m3-surface border border-m3-border text-white text-[11px] font-medium rounded-xl hover:bg-m3-container transition font-sans">
-                        <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
-                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                    <button id="openVercelSyncBtn" type="button" onclick="downloadPandaVaultSync()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-m3-surface border border-m3-border text-white text-[11px] font-medium rounded-xl hover:bg-m3-container transition font-sans">
+                        <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.1.79-.25.79-.55v-2.13c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.26-1.28-5.26-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.12 3.06.74.81 1.19 1.84 1.19 3.1 0 4.42-2.71 5.4-5.29 5.69.41.36.78 1.06.78 2.14v3.17c0 .3.21.65.8.54A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
                         </svg>
-                        <span>VERCEL MODS.JSON</span>
+                        <span>SYNC</span>
                     </button>
                 </div>
             </div>
@@ -1842,84 +1842,91 @@ function charUnmappedKeys(data,mapped,report){if(!data||typeof data!=='object'||
         loadMods();
         loadPublishedAbout();
 
-        // SYNC
-        const vercelSyncModal = document.getElementById('vercelSyncModal');
-
-        function makeSyncModsJson() {
-            return {
-                version: 2,
-                app: 'PandaVault',
-                type: 'mods',
-                updatedAt: new Date().toISOString(),
-                mods: Array.isArray(modsData) ? modsData : []
-            };
+        // SYNC: direct ZIP download, no modal or external ZIP library required
+        function pvZipCrc32(bytes) {
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < bytes.length; i++) {
+                crc ^= bytes[i];
+                for (let j = 0; j < 8; j++) crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+            }
+            return (crc ^ 0xFFFFFFFF) >>> 0;
         }
 
-        function makeSyncAboutJson() {
-            const existing = window.__pandaVaultAbout || {};
-            return {
-                version: 2,
-                app: 'PandaVault',
-                type: 'about',
-                updatedAt: new Date().toISOString(),
-                html: typeof existing.html === 'string' ? existing.html : '',
-                cards: Array.isArray(existing.cards) ? existing.cards : []
-            };
+        function pvZipU16(v) { return new Uint8Array([v & 255, (v >>> 8) & 255]); }
+        function pvZipU32(v) { return new Uint8Array([v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]); }
+        function pvConcat(parts) {
+            let total = parts.reduce((n, p) => n + p.length, 0);
+            const out = new Uint8Array(total);
+            let at = 0;
+            for (const part of parts) { out.set(part, at); at += part.length; }
+            return out;
         }
 
-        document.getElementById('openVercelSyncBtn')?.addEventListener('click', () => {
-            document.getElementById('syncZipStatus').textContent = '';
-            vercelSyncModal.classList.remove('hidden');
-        });
+        function pvMakeStoredZip(files) {
+            const encoder = new TextEncoder();
+            const local = [];
+            const central = [];
+            let offset = 0;
+            const now = new Date();
+            const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+            const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
 
-        document.getElementById('closeVercelSyncModalBtn')?.addEventListener('click', () => {
-            vercelSyncModal.classList.add('hidden');
-        });
+            for (const file of files) {
+                const name = encoder.encode(file.name);
+                const data = encoder.encode(file.data);
+                const crc = pvZipCrc32(data);
+                const localHeader = pvConcat([
+                    pvZipU32(0x04034b50), pvZipU16(20), pvZipU16(0x0800), pvZipU16(0),
+                    pvZipU16(dosTime), pvZipU16(dosDate), pvZipU32(crc), pvZipU32(data.length),
+                    pvZipU32(data.length), pvZipU16(name.length), pvZipU16(0), name
+                ]);
+                local.push(localHeader, data);
 
-        document.getElementById('downloadSyncZipBtn')?.addEventListener('click', async () => {
-            const status = document.getElementById('syncZipStatus');
-            const btn = document.getElementById('downloadSyncZipBtn');
+                const centralHeader = pvConcat([
+                    pvZipU32(0x02014b50), pvZipU16(20), pvZipU16(20), pvZipU16(0x0800), pvZipU16(0),
+                    pvZipU16(dosTime), pvZipU16(dosDate), pvZipU32(crc), pvZipU32(data.length), pvZipU32(data.length),
+                    pvZipU16(name.length), pvZipU16(0), pvZipU16(0), pvZipU16(0), pvZipU16(0), pvZipU32(0), pvZipU32(offset), name
+                ]);
+                central.push(centralHeader);
+                offset += localHeader.length + data.length;
+            }
+
+            const centralBytes = pvConcat(central);
+            const localBytes = pvConcat(local);
+            const end = pvConcat([
+                pvZipU32(0x06054b50), pvZipU16(0), pvZipU16(0), pvZipU16(files.length), pvZipU16(files.length),
+                pvZipU32(centralBytes.length), pvZipU32(localBytes.length), pvZipU16(0)
+            ]);
+            return new Blob([localBytes, centralBytes, end], {type:'application/zip'});
+        }
+
+        function downloadPandaVaultSync() {
             try {
-                btn.disabled = true;
-                status.textContent = 'Building sync package...';
-
-                const modsJson = JSON.stringify(makeSyncModsJson(), null, 2);
-                const aboutJson = JSON.stringify(makeSyncAboutJson(), null, 2);
-
-                if (!window.JSZip) {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-                    script.onload = () => document.getElementById('downloadSyncZipBtn').click();
-                    script.onerror = () => {
-                        status.textContent = 'Could not load ZIP generator. Check your connection and try again.';
-                        btn.disabled = false;
-                    };
-                    document.head.appendChild(script);
-                    return;
-                }
-
-                const zip = new JSZip();
-                zip.file('mods.json', modsJson);
-                zip.file('about.json', aboutJson);
-
-                const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
-                const url = URL.createObjectURL(blob);
+                const modsPayload = {
+                    version: 2, app: 'PandaVault', type: 'mods',
+                    updatedAt: new Date().toISOString(),
+                    mods: Array.isArray(modsData) ? modsData : []
+                };
+                const aboutPayload = typeof getAboutPayload === 'function' ? getAboutPayload() : {
+                    version: 2, app: 'PandaVault', type: 'about', updatedAt: new Date().toISOString(), html: '', cards: []
+                };
+                const zip = pvMakeStoredZip([
+                    {name:'mods.json', data:JSON.stringify(modsPayload, null, 2) + '\n'},
+                    {name:'about.json', data:JSON.stringify(aboutPayload, null, 2) + '\n'}
+                ]);
+                const url = URL.createObjectURL(zip);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'PandaVault-SYNC.zip';
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-                status.textContent = 'Downloaded PandaVault-SYNC.zip';
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
             } catch (error) {
-                console.error(error);
-                status.textContent = 'SYNC failed. Try again.';
-            } finally {
-                btn.disabled = false;
+                console.error('PandaVault SYNC failed:', error);
+                alert('SYNC failed. Please try again.');
             }
-        });
+        }
 
         // Global Keyboard Shortcut: ESC closes modals
         window.addEventListener('keydown', (e) => {
