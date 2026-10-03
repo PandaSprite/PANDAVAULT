@@ -111,6 +111,30 @@
             );
             background-size: 100% 3px, 6px 100%;
         }
+
+        body.pv-light { background:#f5f5f5 !important; color:#111 !important; }
+        body.pv-light header { background:rgba(250,250,250,.96) !important; border-color:#ddd !important; }
+        body.pv-light #sidebarDrawer, body.pv-light main { background:#f5f5f5 !important; }
+        body.pv-light #sidebarDrawer { border-color:#ddd !important; }
+        body.pv-light .text-white { color:#111 !important; }
+        body.pv-light .text-gray-300 { color:#333 !important; }
+        body.pv-light .text-gray-400, body.pv-light .text-gray-500 { color:#666 !important; }
+        body.pv-light .bg-black, body.pv-light .bg-black\/95, body.pv-light .bg-black\/90 { background:#fafafa !important; }
+        body.pv-light .bg-m3-surface { background:#fff !important; }
+        body.pv-light .bg-m3-container { background:#e9e9e9 !important; }
+        body.pv-light .border-m3-border, body.pv-light .border-m3-surfaceVariant { border-color:#ddd !important; }
+        body.pv-light input:not([type="checkbox"]):not([type="radio"]), body.pv-light textarea, body.pv-light select { background:#fff !important; color:#111 !important; border-color:#ccc !important; }
+        body.pv-light .mod-card { background:#fff !important; border-color:#ddd !important; }
+
+        /* Settings theme switch */
+        .pv-theme-switch { position:relative; width:52px; height:30px; border-radius:9999px; background:#2a2a2a; border:1px solid #444; transition:background .2s, border-color .2s; cursor:pointer; flex-shrink:0; }
+        .pv-theme-switch::after { content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:transform .2s cubic-bezier(.16,1,.3,1); }
+        .pv-theme-switch.active { background:#fff; border-color:#fff; }
+        .pv-theme-switch.active::after { transform:translateX(22px); background:#000; }
+        body.pv-light .pv-theme-switch { background:#111; border-color:#111; }
+        body.pv-light .pv-theme-switch::after { background:#fff; }
+        body.pv-light .pv-theme-switch.active { background:#111; border-color:#111; }
+        body.pv-light .pv-theme-switch.active::after { background:#fff; }
     </style>
 </head>
 <body class="h-full flex flex-col min-h-screen bg-black text-white antialiased selection:bg-white selection:text-black">
@@ -185,6 +209,19 @@
                         </button>
                     </div>
 
+                    <button id="openAboutPageBtn" type="button" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
+                        <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM11 9h2V7h-2v2z"/></svg>
+                        <span>About</span>
+                    </button>
+                    <button id="openArticlesPageBtn" type="button" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
+                        <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 5h16v2H4V9zm0 5h10v2H4v-2zm0 5h10v2H4v-2z"/></svg>
+                        <span>Articles</span>
+                    </button>
+                    <button id="openSettingsBtn" type="button" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
+                        <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65-2-3.46-2.49 1a7.7 7.7 0 0 0-1.69-.98L15 3h-4l-.36 2.93c-.61.25-1.18.58-1.69.98l-2.49-1-2 3.46 2.11 1.65c-.04.32-.08.65-.08.98l-2.11 1.65 2 3.46 2.49-1c.51.4 1.08.73 1.69.98L11 21h4l.36-2.93c.61-.25 1.18-.58 1.69-.98l2.49 1 2-3.46-2.11-1.65zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg>
+                        <span>Settings</span>
+                    </button>
+
                     <!-- CATEGORIES SECTION HEADER -->
                     <div class="pt-2 border-t border-m3-surfaceVariant">
                         <span class="px-3 text-[11px] font-bold tracking-widest text-gray-500 uppercase font-mono">Categories</span>
@@ -225,20 +262,15 @@
                                 </svg>
                                 <span>Codename Engine</span>
                             </button>
+
+                            <!-- Utility -->
+                            <button data-category="Utility" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
+                                <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.7 7.7 0 0 0-1.7 1l-.3-2h-4l-.3 2a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.7 7.7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.7 7.7 0 0 0 1.7 1l.3 2h4l.3-2a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.5-2.1-1.5zM13 14h-2v-2h2v2z"/></svg>
+                                <span>Utility</span>
+                            </button>
                         </div>
                     </div>
                 </nav>
-
-                <div id="pageNav" class="pt-2 border-t border-m3-surfaceVariant space-y-1">
-                    <button id="openAboutPageBtn" type="button" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
-                        <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM11 9h2V7h-2v2z"/></svg>
-                        <span>About</span>
-                    </button>
-                    <button id="openArticlesPageBtn" type="button" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-gray-400 hover:text-white hover:bg-m3-surface">
-                        <svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 5h16v2H4V9zm0 5h10v2H4v-2zm0 5h10v2H4v-2z"/></svg>
-                        <span>Articles</span>
-                    </button>
-                </div>
 
                 <!-- CREATOR MANAGEMENT ACTIONS -->
                 <div id="adminSidebarSection" class="hidden border-t border-m3-surfaceVariant pt-4 space-y-2 font-mono">
@@ -299,23 +331,33 @@
             </section>
 
             <section id="articlesPage" class="hidden max-w-4xl mx-auto w-full space-y-5">
-                <div class="border-b border-m3-surfaceVariant pb-4">
+                <div>
                     <h2 class="font-display font-bold text-2xl text-white">Articles</h2>
-                    <p class="text-xs text-gray-500 mt-1">Creator-published updates.</p>
+                    <p class="text-sm text-gray-500 mt-1">Articles published to PandaVault.</p>
                 </div>
-                <div id="articlesList" class="space-y-4"></div>
-                <div id="articlesAdmin" class="hidden border-t border-m3-surfaceVariant pt-5">
-                    <div class="text-[10px] font-bold tracking-widest text-gray-500 uppercase font-mono mb-3">[ CREATOR ARTICLE PUBLISHER ]</div>
-                    <div class="grid gap-3">
-                        <input id="articleVersion" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="Version / label">
-                        <input id="articleDate" type="date" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white">
-                        <input id="articleTitle" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="Article title">
-                        <textarea id="articleChanges" rows="5" class="w-full bg-black border border-m3-border rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="One change per line"></textarea>
-                        <div class="flex gap-2">
-                            <button id="publishArticleBtn" type="button" class="px-4 py-2.5 bg-white text-black font-semibold rounded-xl text-sm">Publish Article</button>
-                            <button id="reloadArticlesBtn" type="button" class="px-4 py-2.5 bg-m3-surface border border-m3-border text-white rounded-xl text-sm">Reload</button>
+                <article id="articlesContent" class="bg-m3-surface border border-m3-border rounded-2xl p-6 text-sm text-gray-300 leading-relaxed"></article>
+                <div id="articlesCards" class="grid gap-4 sm:grid-cols-2"></div>
+            </section>
+
+            <section id="settingsPage" class="hidden max-w-4xl mx-auto w-full space-y-6">
+                <div class="border-b border-m3-surfaceVariant pb-4">
+                    <div>
+                        <h2 class="font-display font-bold text-2xl text-white">Settings</h2>
+                        <p class="text-sm text-gray-500 mt-1">Customize your PandaVault experience.</p>
+                    </div>
+                </div>
+
+                <div class="bg-m3-surface border border-m3-border rounded-2xl overflow-hidden">
+                    <div class="px-5 py-4 border-b border-m3-surfaceVariant">
+                        <h3 class="font-display font-semibold text-base text-white">Appearance</h3>
+                        <p class="text-xs text-gray-500 mt-1">Choose how PandaVault looks on this device.</p>
+                    </div>
+                    <div class="px-5 py-5 flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-white">Light theme</p>
+                            <p id="themeSwitchDescription" class="text-xs text-gray-500 mt-1">Use the dark OLED theme.</p>
                         </div>
-                        <p id="articleAdminMessage" class="text-xs text-gray-500"></p>
+                        <button id="themeSwitch" type="button" class="pv-theme-switch" role="switch" aria-checked="false" aria-label="Toggle light theme"></button>
                     </div>
                 </div>
             </section>
@@ -363,6 +405,7 @@
                         <option value="Psych Engine">Psych Engine</option>
                         <option value="P-Slice">P-Slice</option>
                         <option value="Codename Engine">Codename Engine</option>
+                        <option value="Utility">Utility</option>
                     </select>
                 </div>
 
@@ -483,6 +526,7 @@
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7H5v2h14v-2zM5 18v2h14v-2H5z"/></svg>
                     <span>DOWNLOAD ABOUT.JSON</span>
                 </button>
+                <button id="downloadArticlesJsonBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-m3-surface border border-m3-border text-white font-bold rounded-xl hover:bg-m3-container transition text-xs font-sans">Download articles.json</button>
 
                 <button id="downloadJsonBtn" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition text-xs font-sans">
                     <svg class="w-4 h-4 fill-current text-black" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -514,7 +558,9 @@
         let isAdmin = false;
         const ABOUT_DEFAULT = { html: '<h2>About PandaVault</h2><p>A small home for the mods, tools, and projects worth keeping.</p>', cards: [] };
         let aboutData = ABOUT_DEFAULT;
-        let articlesData = [];
+        const ARTICLES_DEFAULT = { html: '', cards: [] };
+        let articlesData = ARTICLES_DEFAULT;
+        let themeMode = localStorage.getItem('pandavault_theme') || 'dark';
         let currentPage = 'home';
 
         // Extract YouTube Video ID from standard YouTube URL
@@ -579,6 +625,7 @@
         }
         function getModsPayload(){ return Array.isArray(modsData) ? modsData : []; }
         function getAboutPayload(){ return { html: String(aboutData.html || ABOUT_DEFAULT.html), cards: Array.isArray(aboutData.cards) ? aboutData.cards : [] }; }
+        function getArticlesPayload(){ return { html: String(articlesData.html || ''), cards: Array.isArray(articlesData.cards) ? articlesData.cards : [] }; }
         function safeLocalMods(){ try { return normalizeModsPayload(JSON.parse(localStorage.getItem('pandavault_mods') || '[]')); } catch(e){ return []; } }
         function saveToLocal(){ localStorage.setItem('pandavault_mods', JSON.stringify(modsData)); }
 
@@ -597,16 +644,17 @@
         }
 
         async function loadArticles(){
-            try{ const r=await fetch('/api/changelog?pv='+Date.now(),{cache:'no-store'}); if(!r.ok)throw new Error(); const d=await r.json(); articlesData=Array.isArray(d.entries)?d.entries:[]; }catch(e){ articlesData=[]; }
-            renderArticles(); renderArticlesAdmin();
+            try{
+                const r=await fetch('./articles.json?pv='+Date.now(),{cache:'no-store'});
+                if(r.ok){ const data=await r.json(); if(data && typeof data.html==='string') articlesData={html:data.html,cards:Array.isArray(data.cards)?data.cards:[]}; }
+            }catch(e){}
+            renderArticles();
         }
         function renderArticles(){
-            const el=document.getElementById('articlesList'); if(!el)return;
-            const entries=[...articlesData].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-            el.innerHTML=entries.length?entries.map(e=>`<article class="bg-m3-surface border border-m3-border rounded-2xl p-5"><div class="flex items-start justify-between gap-3"><div><div class="text-[10px] text-gray-500 font-mono">${escapeHtml(e.version||'')}</div><h3 class="font-display font-bold text-lg text-white mt-1">${escapeHtml(e.title||'Untitled')}</h3></div><time class="text-xs text-gray-500">${escapeHtml(e.date||'')}</time></div><ul class="mt-4 space-y-2 text-sm text-gray-300">${(e.changes||[]).map(c=>`<li>• ${escapeHtml(c)}</li>`).join('')}</ul></article>`).join(''):'<div class="bg-m3-surface border border-m3-border rounded-2xl p-5 text-sm text-gray-500">No articles have been published yet.</div>';
-        }
-        function renderArticlesAdmin(){
-            document.getElementById('articlesAdmin')?.classList.toggle('hidden',!isAdmin);
+            const el=document.getElementById('articlesContent');
+            if(el) el.innerHTML=articlesData.html || '';
+            const cards=document.getElementById('articlesCards');
+            if(cards) cards.innerHTML=(articlesData.cards||[]).map(c=>`<article class="bg-m3-surface border border-m3-border rounded-2xl p-5"><h3 class="font-bold text-white">${escapeHtml(c.title||'')}</h3><div class="text-sm text-gray-400 mt-2 leading-relaxed">${c.content||''}</div></article>`).join('');
         }
 
         async function initApp(){
@@ -938,29 +986,43 @@
         document.getElementById('closeVercelSyncModalBtn').addEventListener('click',()=>vercelSyncModal.classList.add('hidden'));
         document.getElementById('downloadJsonBtn').addEventListener('click',()=>downloadJsonFile('mods.json',getModsPayload()));
         document.getElementById('downloadAboutJsonBtn').addEventListener('click',()=>downloadJsonFile('about.json',getAboutPayload()));
+        document.getElementById('downloadArticlesJsonBtn').addEventListener('click',()=>downloadJsonFile('articles.json',getArticlesPayload()));
         document.getElementById('copyJsonBtn').addEventListener('click',()=>{ const text=JSON.stringify(getModsPayload(),null,2); if(navigator.clipboard) navigator.clipboard.writeText(text).then(()=>alert('Copied mods.json!')).catch(()=>alert('Copy failed. Use download instead.')); else alert('Clipboard unavailable. Use download instead.'); });
         document.getElementById('importJsonBtn').addEventListener('click',()=>{ try{ const parsed=JSON.parse(document.getElementById('jsonImportArea').value); const imported=normalizeModsPayload(parsed); if(!Array.isArray(imported))throw new Error(); modsData=imported; saveToLocal(); renderMods(); vercelSyncModal.classList.add('hidden'); alert('Successfully imported mod data!'); }catch(e){ alert('Invalid PandaVault mods.json. Use the original array format or a wrapped file containing a mods array.'); } });
 
         // About / Articles navigation
         function showPage(page){
             currentPage=page;
-            const home=document.getElementById('mainViewContainer'); const about=document.getElementById('aboutPage'); const articles=document.getElementById('articlesPage');
-            home?.classList.toggle('hidden',page!=='home'); about?.classList.toggle('hidden',page!=='about'); articles?.classList.toggle('hidden',page!=='articles');
-            document.querySelectorAll('#pageNav button').forEach(b=>{const active=(page==='about'&&b.id==='openAboutPageBtn')||(page==='articles'&&b.id==='openArticlesPageBtn');b.classList.toggle('bg-m3-container',active);b.classList.toggle('text-white',active);});
+            const home=document.getElementById('mainViewContainer'); const about=document.getElementById('aboutPage'); const articles=document.getElementById('articlesPage'); const settings=document.getElementById('settingsPage');
+            home?.classList.toggle('hidden',page!=='home'); about?.classList.toggle('hidden',page!=='about'); articles?.classList.toggle('hidden',page!=='articles'); settings?.classList.toggle('hidden',page!=='settings');
+            document.querySelectorAll('#openAboutPageBtn, #openArticlesPageBtn, #openSettingsBtn').forEach(b=>{const active=(page==='about'&&b.id==='openAboutPageBtn')||(page==='articles'&&b.id==='openArticlesPageBtn')||(page==='settings'&&b.id==='openSettingsBtn');b.classList.toggle('bg-m3-container',active);b.classList.toggle('text-white',active);b.classList.toggle('font-semibold',active);b.classList.toggle('font-medium',!active);});
             if(page==='about') loadAbout(); if(page==='articles') loadArticles();
+            if(page==='settings') updateThemeSwitch();
             if(window.innerWidth<1024) toggleDrawer();
         }
         document.getElementById('openAboutPageBtn').addEventListener('click',()=>showPage('about'));
         document.getElementById('openArticlesPageBtn').addEventListener('click',()=>showPage('articles'));
         document.querySelector('#categoryNav [data-category="ALL"]')?.addEventListener('click',()=>showPage('home'));
 
-        // Creator article publisher
-        document.getElementById('publishArticleBtn')?.addEventListener('click',async()=>{
-            if(!isAdmin)return; const version=document.getElementById('articleVersion').value.trim(); const date=document.getElementById('articleDate').value; const title=document.getElementById('articleTitle').value.trim(); const changes=document.getElementById('articleChanges').value.split(/\n+/).map(x=>x.trim()).filter(Boolean); const msg=document.getElementById('articleAdminMessage');
-            if(!version||!date||!title||!changes.length){msg.textContent='Version, date, title, and at least one change are required.';return;}
-            try{const r=await fetch('/api/changelog',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({version,date,title,changes})}); if(!r.ok)throw new Error(); document.getElementById('articleTitle').value='';document.getElementById('articleChanges').value='';msg.textContent='Published.';await loadArticles();}catch(e){msg.textContent='Publish failed. Check Creator authentication and Vercel Blob.';}
-        });
-        document.getElementById('reloadArticlesBtn')?.addEventListener('click',loadArticles);
+        // Settings / theme
+        function applyTheme(mode){
+            themeMode = mode === 'light' ? 'light' : 'dark';
+            document.body.classList.toggle('pv-light', themeMode === 'light');
+            localStorage.setItem('pandavault_theme', themeMode);
+            updateThemeSwitch();
+        }
+        function updateThemeSwitch(){
+            const sw=document.getElementById('themeSwitch');
+            const desc=document.getElementById('themeSwitchDescription');
+            if(!sw) return;
+            const light=themeMode==='light';
+            sw.classList.toggle('active',light);
+            sw.setAttribute('aria-checked',String(light));
+            if(desc) desc.textContent=light?'Use the light theme.':'Use the dark OLED theme.';
+        }
+        document.getElementById('openSettingsBtn')?.addEventListener('click',()=>showPage('settings'));
+        document.getElementById('themeSwitch')?.addEventListener('click',()=>applyTheme(themeMode==='dark'?'light':'dark'));
+        applyTheme(themeMode);
 
         // Global Keyboard Shortcut: ESC closes modals
         window.addEventListener('keydown', (e) => {
@@ -968,6 +1030,7 @@
                 closeTerminalModal();
                 uploadModal.classList.add('hidden');
                 vercelSyncModal.classList.add('hidden');
+                if(currentPage==='settings') showPage('home');
             }
         });
 
