@@ -1238,27 +1238,29 @@
         document.getElementById('modColor')?.addEventListener('input', e => setModColor(e.target.value));
 
         async function loadMods(){
-            let loaded = false;
+            // Published root-level mods.json is the source of truth for the deployed site.
+            // LocalStorage is only the fallback when the published file is unavailable.
+            let loadedPublished = false;
             try {
-                const local = localStorage.getItem('pandavault_mods');
-                if(local){
-                    modsData = normalizeModsPayload(JSON.parse(local));
-                    loaded = true;
-                }
-            } catch(e) { modsData=[]; }
-
-            // If this browser has no local data, read the published root-level mods.json.
-            // This is what makes the downloaded Vercel/GitHub file actually feed the site.
-            if(!loaded){
-                try {
-                    const res = await fetch('mods.json', {cache:'no-store'});
-                    if(res.ok){
-                        const payload = await res.json();
-                        modsData = normalizeModsPayload(payload);
-                        if(Array.isArray(modsData)) saveToLocal();
+                const res = await fetch('./mods.json', {cache:'no-store'});
+                if(res.ok){
+                    const payload = await res.json();
+                    const publishedMods = normalizeModsPayload(payload);
+                    if(Array.isArray(publishedMods)){
+                        modsData = publishedMods;
+                        saveToLocal();
+                        loadedPublished = true;
                     }
-                } catch(e) { /* Local-only mode is still valid. */ }
+                }
+            } catch(e) { /* Fall through to local data. */ }
+
+            if(!loadedPublished){
+                try {
+                    const local = localStorage.getItem('pandavault_mods');
+                    modsData = local ? normalizeModsPayload(JSON.parse(local)) : [];
+                } catch(e) { modsData=[]; }
             }
+
             if(!Array.isArray(modsData)) modsData=[];
             renderMods();
         }
@@ -1322,15 +1324,33 @@
         function saveAboutCards(cards){ localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(cards)); }
 
         async function loadPublishedAbout(){
+            // Published root-level about.json is the source of truth for the deployed site.
+            // LocalStorage is only the fallback when the published file is unavailable.
+            let loadedPublished = false;
             try {
-                const res=await fetch('about.json', {cache:'no-store'});
-                if(!res.ok) return;
-                const data=await res.json();
-                // Accept both the new v2 object and the older {html,cards} format.
-                if(data && typeof data.html==='string' && !localStorage.getItem(ABOUT_KEY)) localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(data.html));
-                if(data && Array.isArray(data.cards) && !localStorage.getItem(ABOUT_CARDS_KEY)) localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(data.cards));
-                renderAbout();
-            } catch(e) {}
+                const res=await fetch('./about.json', {cache:'no-store'});
+                if(res.ok){
+                    const data=await res.json();
+                    // Accept both the new v2 object and the older {html,cards} format.
+                    if(data && typeof data.html==='string'){
+                        localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(data.html));
+                        loadedPublished = true;
+                    }
+                    if(data && Array.isArray(data.cards)){
+                        localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(data.cards));
+                        loadedPublished = true;
+                    }
+                }
+            } catch(e) { /* Fall through to local data. */ }
+
+            if(!loadedPublished){
+                // Keep existing local About content when no published file is available.
+                try {
+                    if(!localStorage.getItem(ABOUT_KEY)) localStorage.setItem(ABOUT_KEY, DEFAULT_ABOUT);
+                    if(!localStorage.getItem(ABOUT_CARDS_KEY)) localStorage.setItem(ABOUT_CARDS_KEY, '[]');
+                } catch(e) {}
+            }
+            renderAbout();
         }
 
         function getAboutPayload(){
