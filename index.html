@@ -1142,7 +1142,29 @@
         function closeTerminalModal(){ pvAnimateModal(document.getElementById('passcodeModal'), false); }
         const uploadModal = document.getElementById('uploadModal');
         const vercelSyncModal = document.getElementById('vercelSyncModal');
+        const PANDAVAULT_DATA_VERSION = 2;
+
+        function normalizeModsPayload(payload){
+            // PandaVault v2 format: { version, app, mods: [...] }
+            // Legacy array format is still accepted for backwards compatibility.
+            if(Array.isArray(payload)) return payload;
+            if(payload && Array.isArray(payload.mods)) return payload.mods;
+            if(payload && Array.isArray(payload.data)) return payload.data;
+            return [];
+        }
+
+        function getModsPayload(){
+            return {
+                version: PANDAVAULT_DATA_VERSION,
+                app: 'PandaVault',
+                type: 'mods',
+                updatedAt: new Date().toISOString(),
+                mods: Array.isArray(modsData) ? modsData : []
+            };
+        }
+
         function saveToLocal(){ localStorage.setItem('pandavault_mods', JSON.stringify(modsData)); }
+
         function renderMods() {
             const q = searchQuery.trim().toLowerCase();
             const filtered = modsData.filter(m => (currentCategory === 'ALL' || (m.category || '') === currentCategory) && (!q || JSON.stringify(m).toLowerCase().includes(q)));
@@ -1230,7 +1252,31 @@
         document.getElementById('modColorHex')?.addEventListener('input', e => { const v=normalizeHex(e.target.value); if(v)setModColor(v); });
         document.getElementById('modColor')?.addEventListener('input', e => setModColor(e.target.value));
 
-        function loadMods(){ try { modsData=JSON.parse(localStorage.getItem('pandavault_mods')||'[]'); } catch(e){modsData=[];} renderMods(); }
+        async function loadMods(){
+            let loaded = false;
+            try {
+                const local = localStorage.getItem('pandavault_mods');
+                if(local){
+                    modsData = normalizeModsPayload(JSON.parse(local));
+                    loaded = true;
+                }
+            } catch(e) { modsData=[]; }
+
+            // If this browser has no local data, read the published root-level mods.json.
+            // This is what makes the downloaded Vercel/GitHub file actually feed the site.
+            if(!loaded){
+                try {
+                    const res = await fetch('mods.json', {cache:'no-store'});
+                    if(res.ok){
+                        const payload = await res.json();
+                        modsData = normalizeModsPayload(payload);
+                        if(Array.isArray(modsData)) saveToLocal();
+                    }
+                } catch(e) { /* Local-only mode is still valid. */ }
+            }
+            if(!Array.isArray(modsData)) modsData=[];
+            renderMods();
+        }
 
         // Page navigation: keep the existing sidebar UI and only switch the visible view.
         function togglePorterTestLab(show) {
@@ -1295,6 +1341,7 @@
                 const res=await fetch('about.json', {cache:'no-store'});
                 if(!res.ok) return;
                 const data=await res.json();
+                // Accept both the new v2 object and the older {html,cards} format.
                 if(data && typeof data.html==='string' && !localStorage.getItem(ABOUT_KEY)) localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(data.html));
                 if(data && Array.isArray(data.cards) && !localStorage.getItem(ABOUT_CARDS_KEY)) localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(data.cards));
                 renderAbout();
@@ -1302,7 +1349,14 @@
         }
 
         function getAboutPayload(){
-            return { html: sanitizeAboutHtml(localStorage.getItem(ABOUT_KEY) || DEFAULT_ABOUT), cards: getAboutCards() };
+            return {
+                version: PANDAVAULT_DATA_VERSION,
+                app: 'PandaVault',
+                type: 'about',
+                updatedAt: new Date().toISOString(),
+                html: sanitizeAboutHtml(localStorage.getItem(ABOUT_KEY) || DEFAULT_ABOUT),
+                cards: getAboutCards()
+            };
         }
         function renderAbout() {
             const content = localStorage.getItem(ABOUT_KEY) || DEFAULT_ABOUT;
@@ -1804,44 +1858,65 @@ function charUnmappedKeys(data,mapped,report){if(!data||typeof data!=='object'||
         loadPublishedAbout();
 
         // VERCEL / GITHUB SYNC
+        function downloadPandaVaultJson(filename, payload){
+            const json = JSON.stringify(payload, null, 2);
+            const blob = new Blob([json], {type:'application/json;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1000);
+            return json;
+        }
+
+        function copyPandaVaultJson(text, label){
+            const fallback = () => {
+                const area=document.createElement('textarea');
+                area.value=text; area.style.position='fixed'; area.style.opacity='0';
+                document.body.appendChild(area); area.focus(); area.select();
+                let ok=false; try { ok=document.execCommand('copy'); } catch(e) {}
+                area.remove();
+                if(ok) alert('Copied '+label+' to clipboard!'); else alert('Copy failed. Use the download button instead.');
+            };
+            if(navigator.clipboard && window.isSecureContext){
+                navigator.clipboard.writeText(text).then(()=>alert('Copied '+label+' to clipboard!')).catch(fallback);
+            } else fallback();
+        }
+
         document.getElementById('openVercelSyncBtn').addEventListener('click', () => {
-            document.getElementById('jsonImportArea').value = JSON.stringify(modsData, null, 2);
+            // Show the exact v2 file that the site can read back.
+            document.getElementById('jsonImportArea').value = JSON.stringify(getModsPayload(), null, 2);
             pvAnimateModal(vercelSyncModal, true);
         });
         document.getElementById('closeVercelSyncModalBtn').addEventListener('click', () => pvAnimateModal(vercelSyncModal, false));
 
         document.getElementById('downloadAboutJsonBtn').addEventListener('click', () => {
-            const dataStr = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getAboutPayload(), null, 2));
-            const a=document.createElement('a'); a.href=dataStr; a.download='about.json'; document.body.appendChild(a); a.click(); a.remove();
+            downloadPandaVaultJson('about.json', getAboutPayload());
         });
 
         document.getElementById('downloadJsonBtn').addEventListener('click', () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(modsData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "mods.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            downloadPandaVaultJson('mods.json', getModsPayload());
         });
 
         document.getElementById('copyJsonBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(JSON.stringify(modsData, null, 2)).then(() => {
-                alert('Copied mods.json to clipboard!');
-            });
+            copyPandaVaultJson(JSON.stringify(getModsPayload(), null, 2), 'mods.json');
         });
 
         document.getElementById('importJsonBtn').addEventListener('click', () => {
             try {
                 const parsed = JSON.parse(document.getElementById('jsonImportArea').value);
-                if (Array.isArray(parsed)) {
-                    modsData = parsed;
+                const imported = normalizeModsPayload(parsed);
+                if (Array.isArray(imported)) {
+                    modsData = imported;
                     saveToLocal();
                     renderMods();
                     pvAnimateModal(vercelSyncModal, false);
-                    alert('Successfully imported mod data!');
+                    alert('Successfully imported mods.json!');
                 } else {
-                    alert('Invalid JSON format.');
+                    alert('Invalid PandaVault mods.json format.');
                 }
             } catch(e) {
                 alert('JSON Syntax Error.');
