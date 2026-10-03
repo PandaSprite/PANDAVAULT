@@ -1237,31 +1237,67 @@
         document.getElementById('modColorHex')?.addEventListener('input', e => { const v=normalizeHex(e.target.value); if(v)setModColor(v); });
         document.getElementById('modColor')?.addEventListener('input', e => setModColor(e.target.value));
 
-        async function loadMods(){
-            // Published root-level mods.json is the source of truth for the deployed site.
-            // LocalStorage is only the fallback when the published file is unavailable.
-            let loadedPublished = false;
-            try {
-                const res = await fetch('./mods.json', {cache:'no-store'});
-                if(res.ok){
-                    const payload = await res.json();
-                    const publishedMods = normalizeModsPayload(payload);
-                    if(Array.isArray(publishedMods)){
-                        modsData = publishedMods;
-                        saveToLocal();
-                        loadedPublished = true;
-                    }
-                }
-            } catch(e) { /* Fall through to local data. */ }
-
-            if(!loadedPublished){
+        async function pvFetchPublishedJson(filename){
+            // Resolve against the actual document URL so this also works when Vercel
+            // serves the site from a project path instead of the domain root.
+            const base = new URL(filename, document.baseURI).href;
+            const urls = [base, new URL('/' + filename, window.location.origin).href];
+            const unique = [...new Set(urls)];
+            let lastError = null;
+            for (const url of unique) {
                 try {
-                    const local = localStorage.getItem('pandavault_mods');
-                    modsData = local ? normalizeModsPayload(JSON.parse(local)) : [];
-                } catch(e) { modsData=[]; }
+                    const separator = url.includes('?') ? '&' : '?';
+                    const res = await fetch(url + separator + 'pv=' + Date.now(), {
+                        cache: 'no-store',
+                        credentials: 'same-origin',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (!res.ok) {
+                        lastError = new Error(filename + ' returned HTTP ' + res.status);
+                        continue;
+                    }
+                    const text = await res.text();
+                    const trimmed = text.trim();
+                    // Vercel/SPA rewrites can return index.html with HTTP 200 for a
+                    // missing JSON file. Do not mistake that HTML for published data.
+                    if (/^<!doctype html/i.test(trimmed) || /^<html[\s>]/i.test(trimmed)) {
+                        lastError = new Error(filename + ' returned HTML instead of JSON');
+                        continue;
+                    }
+                    try {
+                        return { ok: true, data: JSON.parse(trimmed), url };
+                    } catch (jsonError) {
+                        lastError = new Error(filename + ' returned invalid JSON');
+                    }
+                } catch (e) {
+                    lastError = e;
+                }
+            }
+            console.warn('[PandaVault] Published data unavailable:', filename, lastError || 'unknown error');
+            return { ok: false, data: null, url: null };
+        }
+
+        async function loadMods(){
+            // The deployed JSON is always authoritative. LocalStorage is only used
+            // when the published file truly cannot be fetched or parsed.
+            const result = await pvFetchPublishedJson('mods.json');
+            if(result.ok){
+                const publishedMods = normalizeModsPayload(result.data);
+                if(Array.isArray(publishedMods)){
+                    modsData = publishedMods;
+                    saveToLocal();
+                    console.info('[PandaVault] Loaded published mods from', result.url, '| count:', modsData.length);
+                    renderMods();
+                    return;
+                }
             }
 
+            try {
+                const local = localStorage.getItem('pandavault_mods');
+                modsData = local ? normalizeModsPayload(JSON.parse(local)) : [];
+            } catch(e) { modsData=[]; }
             if(!Array.isArray(modsData)) modsData=[];
+            console.info('[PandaVault] Using local mods fallback | count:', modsData.length);
             renderMods();
         }
 
@@ -1324,33 +1360,30 @@
         function saveAboutCards(cards){ localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(cards)); }
 
         async function loadPublishedAbout(){
-            // Published root-level about.json is the source of truth for the deployed site.
-            // LocalStorage is only the fallback when the published file is unavailable.
+            // Published root-level about.json is the source of truth. LocalStorage is
+            // only a fallback when the file is actually unavailable.
+            const result = await pvFetchPublishedJson('about.json');
             let loadedPublished = false;
-            try {
-                const res=await fetch('./about.json', {cache:'no-store'});
-                if(res.ok){
-                    const data=await res.json();
-                    // Accept both the new v2 object and the older {html,cards} format.
-                    if(data && typeof data.html==='string'){
-                        localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(data.html));
-                        loadedPublished = true;
-                    }
-                    if(data && Array.isArray(data.cards)){
-                        localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(data.cards));
-                        loadedPublished = true;
-                    }
+            if(result.ok){
+                const data = result.data;
+                if(data && typeof data.html === 'string'){
+                    localStorage.setItem(ABOUT_KEY, sanitizeAboutHtml(data.html));
+                    loadedPublished = true;
                 }
-            } catch(e) { /* Fall through to local data. */ }
-
+                if(data && Array.isArray(data.cards)){
+                    localStorage.setItem(ABOUT_CARDS_KEY, JSON.stringify(data.cards));
+                    loadedPublished = true;
+                }
+                console.info('[PandaVault] Loaded published About from', result.url);
+            }
             if(!loadedPublished){
-                // Keep existing local About content when no published file is available.
                 try {
                     if(!localStorage.getItem(ABOUT_KEY)) localStorage.setItem(ABOUT_KEY, DEFAULT_ABOUT);
                     if(!localStorage.getItem(ABOUT_CARDS_KEY)) localStorage.setItem(ABOUT_CARDS_KEY, '[]');
                 } catch(e) {}
             }
             renderAbout();
+            if(typeof renderAboutCards === 'function') renderAboutCards();
         }
 
         function getAboutPayload(){
